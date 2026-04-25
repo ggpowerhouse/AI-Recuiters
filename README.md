@@ -7,7 +7,7 @@ A working prototype + product brief that combines two high-conviction ideas:
 | | Idea | What it is |
 |---|---|---|
 | **A** | **TalentMesh** | Multi-agent AI hiring stack (Sourcer → Screener → Interviewer → Scheduler → Offer Drafter) embedded in SAP SuccessFactors + Joule. |
-| **B** | **AuditReady AEDT** | Independent NYC Local Law 144 bias-audit-as-a-service. Recurring annual revenue. Auditor-independence moat. |
+
 
 **The product fuses the two:** every hiring decision the agents make is automatically captured into an audit-ready evidence pack — customers buy the hiring platform *and* the compliance tollbooth in one motion.
 

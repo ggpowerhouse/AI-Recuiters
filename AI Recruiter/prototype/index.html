@@ -1,0 +1,2018 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="AuditReady — agentic hiring with built-in third-party bias auditing. Working demo." />
+    <meta name="robots" content="noindex" />
+    <title>AuditReady · Working Demo · Agentic Hiring + Independent Bias Audit</title>
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366F1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L4 6v6c0 5 3.5 9.7 8 10 4.5-.3 8-5 8-10V6l-8-4z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+            },
+            colors: {
+              ink: { 950: '#020617', 900: '#0F172A', 800: '#1E293B', 700: '#334155', 600: '#475569', 500: '#64748B', 400: '#94A3B8' },
+              brand: { 50: '#EEF2FF', 100: '#E0E7FF', 500: '#6366F1', 600: '#4F46E5', 700: '#4338CA' },
+              ok: { 50: '#ECFDF5', 100: '#D1FAE5', 500: '#10B981', 600: '#059669', 700: '#047857' },
+              warn: { 50: '#FFFBEB', 100: '#FEF3C7', 500: '#F59E0B', 600: '#D97706', 700: '#B45309' },
+              danger: { 50: '#FEF2F2', 100: '#FEE2E2', 500: '#EF4444', 600: '#DC2626', 700: '#B91C1C' },
+              surface: { 50: '#F8FAFC', 100: '#F1F5F9', 200: '#E2E8F0', 300: '#CBD5E1' },
+            },
+            boxShadow: {
+              soft: '0 1px 2px 0 rgba(15, 23, 42, 0.04), 0 1px 3px 0 rgba(15, 23, 42, 0.06)',
+              card: '0 6px 32px -12px rgba(15, 23, 42, 0.10), 0 2px 4px -1px rgba(15, 23, 42, 0.04)',
+              glow: '0 0 0 6px rgba(99, 102, 241, 0.10)',
+            },
+            keyframes: {
+              fadeUp: { from: { opacity: 0, transform: 'translateY(8px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+              fadeIn: { from: { opacity: 0 }, to: { opacity: 1 } },
+              shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+              countUp: { from: { transform: 'translateY(6px)', opacity: 0 }, to: { transform: 'translateY(0)', opacity: 1 } },
+            },
+            animation: {
+              fadeUp: 'fadeUp 0.5s ease-out both',
+              fadeIn: 'fadeIn 0.4s ease-out both',
+              shimmer: 'shimmer 1.6s linear infinite',
+              countUp: 'countUp 0.45s ease-out both',
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      html, body, #root { height: 100%; }
+      html { color-scheme: light; }
+      html[data-theme="dark"] { color-scheme: dark; }
+      body {
+        background: #F8FAFC;
+        color: #0F172A;
+        font-family: Inter, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        transition: background-color .25s ease, color .25s ease;
+      }
+      .scroll-soft::-webkit-scrollbar { width: 8px; height: 8px; }
+      .scroll-soft::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 8px; }
+      .scroll-soft::-webkit-scrollbar-track { background: transparent; }
+      .pulse-dot { position: relative; }
+      .pulse-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 9999px; background: currentColor; opacity: .35; animation: pulseDot 1.6s ease-out infinite; }
+      @keyframes pulseDot { 0% { transform: scale(1); opacity: .35; } 70% { transform: scale(2.4); opacity: 0; } 100% { opacity: 0; } }
+      .feed-in { animation: fadeUp .5s ease-out both; }
+      .skill-mark {
+        background: linear-gradient(180deg, transparent 55%, rgba(16, 185, 129, .28) 55%);
+        padding: 0 1px;
+        border-radius: 2px;
+        font-weight: 600;
+        color: #064E3B;
+      }
+      .skill-mark-miss {
+        background: linear-gradient(180deg, transparent 55%, rgba(245, 158, 11, .28) 55%);
+        padding: 0 1px;
+        border-radius: 2px;
+        font-weight: 600;
+        color: #78350F;
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #6366F1 0%, #10B981 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .grid-pattern {
+        background-image:
+          linear-gradient(to right, rgba(15, 23, 42, .04) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(15, 23, 42, .04) 1px, transparent 1px);
+        background-size: 32px 32px;
+      }
+      .shimmer-bg {
+        background: linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 50%, #F1F5F9 100%);
+        background-size: 200% 100%;
+        animation: shimmer 1.6s linear infinite;
+      }
+      .step-line { position: absolute; left: 19px; top: 40px; bottom: -14px; width: 2px; background: linear-gradient(to bottom, #CBD5E1 0%, #CBD5E1 50%, transparent 100%); }
+      .step-line-active { background: linear-gradient(to bottom, #6366F1 0%, #10B981 100%); }
+      details > summary { list-style: none; }
+      details > summary::-webkit-details-marker { display: none; }
+
+      /* ============================================================
+         DARK MODE — global override layer
+         Activated when <html data-theme="dark">
+         Remaps the most-used Tailwind color utilities so we don't
+         have to touch every JSX className. Brand colors (brand-*,
+         ok-*, warn-*, danger-*, ink-900) intentionally stay constant
+         so heroes, sidebar, and accent pills look identical.
+         ============================================================ */
+      html[data-theme="dark"] body { background: #0B1220; color: #E2E8F0; }
+      html[data-theme="dark"] .scroll-soft::-webkit-scrollbar-thumb { background: #334155; }
+
+      /* Surfaces */
+      html[data-theme="dark"] .bg-white { background-color: #0F172A; }
+      html[data-theme="dark"] .bg-white\/70 { background-color: rgba(15, 23, 42, 0.72); }
+      html[data-theme="dark"] .bg-white\/80 { background-color: rgba(15, 23, 42, 0.82); }
+      html[data-theme="dark"] .bg-white\/90 { background-color: rgba(15, 23, 42, 0.92); }
+      html[data-theme="dark"] .bg-white\/5 { background-color: rgba(255, 255, 255, 0.05); }
+      html[data-theme="dark"] .bg-surface-50 { background-color: #0B1220; }
+      html[data-theme="dark"] .bg-surface-100 { background-color: #1E293B; }
+      html[data-theme="dark"] .bg-surface-200 { background-color: #1E293B; }
+      html[data-theme="dark"] .bg-surface-300 { background-color: #334155; }
+
+      /* Card gradients (from/via/to-white in light mode → ink in dark) */
+      html[data-theme="dark"] .from-white { --tw-gradient-from: #0F172A var(--tw-gradient-from-position); --tw-gradient-to: rgba(15, 23, 42, 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+      html[data-theme="dark"] .via-white { --tw-gradient-to: rgba(15, 23, 42, 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), #0F172A var(--tw-gradient-via-position), var(--tw-gradient-to); }
+      html[data-theme="dark"] .to-white { --tw-gradient-to: #0F172A var(--tw-gradient-to-position); }
+
+      /* Text */
+      html[data-theme="dark"] .text-ink-900 { color: #F1F5F9; }
+      html[data-theme="dark"] .text-ink-800 { color: #E2E8F0; }
+      html[data-theme="dark"] .text-ink-700 { color: #CBD5E1; }
+      html[data-theme="dark"] .text-ink-600 { color: #94A3B8; }
+      html[data-theme="dark"] .text-ink-500 { color: #64748B; }
+      html[data-theme="dark"] .text-ink-400 { color: #475569; }
+
+      /* Borders */
+      html[data-theme="dark"] .border-surface-200 { border-color: #1E293B; }
+      html[data-theme="dark"] .border-surface-100 { border-color: #1E293B; }
+      html[data-theme="dark"] .border-surface-300 { border-color: #334155; }
+      html[data-theme="dark"] .divide-surface-200 > :not([hidden]) ~ :not([hidden]) { border-color: #1E293B; }
+      html[data-theme="dark"] .border-white\/10 { border-color: rgba(255, 255, 255, 0.10); }
+
+      /* Soft brand/state tints — dim them so they read as accents on dark */
+      html[data-theme="dark"] .bg-brand-50 { background-color: rgba(99, 102, 241, 0.14); }
+      html[data-theme="dark"] .bg-brand-100 { background-color: rgba(99, 102, 241, 0.20); }
+      html[data-theme="dark"] .bg-ok-50 { background-color: rgba(16, 185, 129, 0.14); }
+      html[data-theme="dark"] .bg-ok-100 { background-color: rgba(16, 185, 129, 0.22); }
+      html[data-theme="dark"] .bg-warn-50 { background-color: rgba(245, 158, 11, 0.14); }
+      html[data-theme="dark"] .bg-warn-100 { background-color: rgba(245, 158, 11, 0.22); }
+      html[data-theme="dark"] .bg-danger-50 { background-color: rgba(239, 68, 68, 0.14); }
+      html[data-theme="dark"] .bg-danger-100 { background-color: rgba(239, 68, 68, 0.22); }
+
+      /* Accent text shifts brighter on dark */
+      html[data-theme="dark"] .text-brand-600 { color: #A5B4FC; }
+      html[data-theme="dark"] .text-brand-700 { color: #C7D2FE; }
+      html[data-theme="dark"] .text-ok-600 { color: #6EE7B7; }
+      html[data-theme="dark"] .text-ok-700 { color: #A7F3D0; }
+      html[data-theme="dark"] .text-warn-600 { color: #FCD34D; }
+      html[data-theme="dark"] .text-warn-700 { color: #FDE68A; }
+      html[data-theme="dark"] .text-danger-600 { color: #FCA5A5; }
+      html[data-theme="dark"] .text-danger-700 { color: #FECACA; }
+
+      /* Hover states */
+      html[data-theme="dark"] .hover\:bg-surface-50:hover { background-color: #1E293B; }
+      html[data-theme="dark"] .hover\:bg-surface-100:hover { background-color: #334155; }
+      html[data-theme="dark"] .hover\:bg-white:hover { background-color: #0F172A; }
+
+      /* Decorative bits */
+      html[data-theme="dark"] .grid-pattern {
+        background-image:
+          linear-gradient(to right, rgba(255, 255, 255, .04) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, .04) 1px, transparent 1px);
+      }
+      html[data-theme="dark"] .shimmer-bg {
+        background: linear-gradient(90deg, #1E293B 0%, #334155 50%, #1E293B 100%);
+        background-size: 200% 100%;
+      }
+      html[data-theme="dark"] .skill-mark { color: #6EE7B7; background: linear-gradient(180deg, transparent 55%, rgba(16, 185, 129, .35) 55%); }
+      html[data-theme="dark"] .skill-mark-miss { color: #FCD34D; background: linear-gradient(180deg, transparent 55%, rgba(245, 158, 11, .35) 55%); }
+      html[data-theme="dark"] .step-line { background: linear-gradient(to bottom, #334155 0%, #334155 50%, transparent 100%); }
+
+      /* Recharts: grid + axis text (use !important — Recharts sets fill/stroke as SVG attrs) */
+      html[data-theme="dark"] .recharts-cartesian-grid line { stroke: #1E293B !important; }
+      html[data-theme="dark"] .recharts-cartesian-axis-line { stroke: #334155 !important; }
+      html[data-theme="dark"] .recharts-text,
+      html[data-theme="dark"] .recharts-cartesian-axis-tick-value,
+      html[data-theme="dark"] .recharts-cartesian-axis-tick-value tspan { fill: #94A3B8 !important; }
+      html[data-theme="dark"] .recharts-default-tooltip {
+        background-color: #0F172A !important;
+        border: 1px solid #1E293B !important;
+        color: #E2E8F0 !important;
+      }
+      html[data-theme="dark"] .recharts-tooltip-label,
+      html[data-theme="dark"] .recharts-tooltip-item { color: #E2E8F0 !important; }
+
+      /* Inputs/textareas */
+      html[data-theme="dark"] textarea, html[data-theme="dark"] input[type="text"], html[data-theme="dark"] input[type="search"] {
+        background-color: #0F172A; color: #E2E8F0; border-color: #334155;
+      }
+      html[data-theme="dark"] textarea::placeholder, html[data-theme="dark"] input::placeholder { color: #64748B; }
+
+      /* Theme-toggle button polish */
+      .theme-toggle { transition: transform .25s ease, background-color .2s ease, color .2s ease; }
+      .theme-toggle:hover { transform: rotate(-12deg); }
+    </style>
+
+    <script>
+      // Apply saved/system theme synchronously before any paint to avoid flash-of-light.
+      (function () {
+        try {
+          var saved = localStorage.getItem('auditready-theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = (saved === 'dark' || saved === 'light') ? saved : (prefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/lucide@0.451.0/dist/umd/lucide.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root">
+      <div class="flex h-full items-center justify-center text-ink-700">
+        <div class="text-center">
+          <div class="mb-3 inline-flex h-10 w-10 animate-spin items-center justify-center rounded-full border-2 border-brand-500 border-t-transparent"></div>
+          <div class="text-sm font-medium">Loading AuditReady…</div>
+          <div class="mt-1 text-xs text-ink-600">If this stays stuck, hard-refresh (Cmd+Shift+R) or check the browser console.</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/babel" data-presets="env,react">
+      /* ============================================================================
+         AuditReady — Working Demo (single-file React SPA)
+         Agentic hiring + independent third-party bias auditing.
+         No build step. No backend. All processing is real and runs in your browser.
+         ============================================================================ */
+
+      const { useState, useEffect, useMemo, useRef, Fragment } = React;
+      const R = window.Recharts || {};
+      const {
+        ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell,
+        RadialBarChart, RadialBar, PolarAngleAxis, AreaChart, Area, LineChart, Line,
+      } = R;
+
+      function classNames() { return Array.from(arguments).filter(Boolean).join(' '); }
+
+      /* ---------------------------------------------------------------------------
+         Skill library + sample JD/Resume + parsing/scoring (real, runs locally)
+         --------------------------------------------------------------------------- */
+      const SKILL_LIBRARY = [
+        // Languages
+        'python','javascript','typescript','java','go','rust','c++','c#','ruby','php','kotlin','swift','scala','sql',
+        // Web / Frontend
+        'react','vue','angular','svelte','next.js','nuxt','tailwind','redux','graphql','webpack','vite',
+        // Backend / API
+        'node','express','django','flask','fastapi','spring','spring boot','rails','microservices','rest','grpc','api design',
+        // Cloud / DevOps
+        'aws','gcp','azure','docker','kubernetes','k8s','terraform','ansible','ci/cd','jenkins','github actions','gitlab','circleci',
+        // Data / Storage
+        'postgresql','postgres','mysql','mongodb','redis','kafka','rabbitmq','snowflake','bigquery','databricks','spark','hadoop','airflow','dbt','elasticsearch',
+        // SAP
+        'sap','s/4hana','s4hana','abap','fico','mm','sd','pp','qm','ewm','mdg','successfactors','employee central','ariba','btp','fiori','ui5','hana','analytics cloud','joule',
+        // AI / ML
+        'machine learning','deep learning','pytorch','tensorflow','scikit-learn','llm','nlp','transformers','rag','langgraph','langchain','mlops','foundation models','ai agents','agentic ai','knowledge graph',
+        // Distributed / Systems
+        'distributed systems','event-driven','event sourcing','cqrs','service mesh','observability','opentelemetry','prometheus','grafana','sre',
+        // Soft / Process
+        'leadership','mentoring','mentorship','communication','product thinking','agile','scrum','kanban','stakeholder management',
+        // Compliance / Domain
+        'gxp','hipaa','sox','gdpr','pci','eeoc','fda','21 cfr part 11','soc 2','iso 27001','bias audit','aedt','local law 144',
+      ];
+
+      const SAMPLE_JD = `Senior Backend Engineer — Hybrid NYC
+
+About the role
+We are hiring a Senior Backend Engineer to join our platform team. You will design and build distributed systems serving 10M+ requests/day across our SaaS platform. You will partner with product, ML, and SRE teams.
+
+Required (must-haves)
+- 5+ years building production backend services
+- Strong proficiency in Python or Go
+- Experience with PostgreSQL, Redis, Kafka
+- AWS or GCP cloud experience
+- Kubernetes, Docker, CI/CD
+- Microservices and API design
+- Distributed systems experience
+
+Nice to have
+- LangGraph or LangChain experience
+- LLM and RAG integration experience
+- Mentoring junior engineers
+- Open-source contributions
+
+What you'll do
+- Design APIs serving 10M+ daily requests
+- Lead architecture reviews
+- Mentor 2-3 junior engineers
+- Own the on-call rotation for the platform team
+
+Location: NYC (Hybrid, 3 days/week in office)
+Compensation: $185,000 - $225,000 base + equity
+Hiring manager: Priya Kapoor, Director of Platform
+`;
+
+      const SAMPLE_RESUME = `Aisha Williams
+Senior Software Engineer | NYC, NY
+aisha.williams@example.com | github.com/aisha-w | linkedin.com/in/aishaw
+
+PROFESSIONAL SUMMARY
+Senior backend engineer with 6 years of experience designing distributed systems and APIs at scale. Strong proficiency in Python, Go, and microservices architecture. Mentored 4 junior engineers. NYC-based, open to hybrid roles.
+
+EXPERIENCE
+
+Senior Backend Engineer — Acme Cloud (2022 - Present)
+- Built distributed Python microservices handling 5M requests/day
+- Designed PostgreSQL schemas and Redis caching strategy across 12 services
+- Led migration from EC2 to Kubernetes on AWS, reducing infra cost by 38%
+- Implemented Kafka event pipeline for billing and audit events
+- Mentored 4 junior engineers; ran weekly architecture reviews
+- On-call lead for platform team; reduced p95 latency by 47%
+
+Backend Engineer — Beta Labs (2019 - 2022)
+- Built APIs in Go and Python, REST + gRPC
+- Implemented CI/CD using GitHub Actions and Docker
+- Worked with LangChain to ship RAG-powered support chatbot (LLM integration)
+- Contributed to internal observability stack (Prometheus, Grafana, OpenTelemetry)
+
+EDUCATION
+B.S. Computer Science, NYU (2019)
+
+SKILLS
+Python, Go, PostgreSQL, Redis, Kafka, AWS, Kubernetes, Docker, CI/CD,
+Microservices, Distributed Systems, REST, gRPC, API Design,
+LangChain, LLM, RAG, Prometheus, Grafana, OpenTelemetry,
+Mentoring, Leadership, Communication
+
+OPEN SOURCE
+- Maintainer: pyqueue (Python distributed task queue, 1.2k GitHub stars)
+- Contributor: langchain (Python AI framework)
+`;
+
+      const RE_META = /[.*+?^${}()|[\]\\]/g;
+      function escapeRe(s) { return String(s).replace(RE_META, '\\$&'); }
+
+      function extractSkills(text) {
+        if (!text) return [];
+        const found = [];
+        const seen = new Set();
+        const lower = text.toLowerCase();
+        for (const skill of SKILL_LIBRARY) {
+          const pat = '(?:^|[^a-z0-9+#./])' + escapeRe(skill) + '(?:$|[^a-z0-9+#./])';
+          const re = new RegExp(pat, 'i');
+          if (re.test(lower) && !seen.has(skill)) {
+            seen.add(skill);
+            found.push(skill);
+          }
+        }
+        return found;
+      }
+
+      function extractYears(text) {
+        if (!text) return 0;
+        const m = String(text).match(/(\d+)\s*\+?\s*years?/i);
+        return m ? parseInt(m[1], 10) : 0;
+      }
+
+      function extractLocation(text) {
+        if (!text) return '';
+        const lower = String(text).toLowerCase();
+        if (lower.includes('remote')) return 'Remote';
+        const cities = ['nyc','new york','brooklyn','jersey city','san francisco','seattle','boston','chicago','austin','london'];
+        for (const c of cities) if (lower.includes(c)) return c.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        return '';
+      }
+
+      function extractLevel(text) {
+        if (!text) return '';
+        const lower = String(text).toLowerCase();
+        const levels = ['principal','staff','senior','lead','mid','junior','entry'];
+        for (const l of levels) if (lower.includes(l)) return l.charAt(0).toUpperCase() + l.slice(1);
+        return '';
+      }
+
+      function extractComp(text) {
+        if (!text) return null;
+        const m = String(text).match(/\$\s*([\d,]+)\s*[-\u2013to]+\s*\$?\s*([\d,]+)/);
+        if (m) return { lo: parseInt(m[1].replace(/,/g, ''), 10), hi: parseInt(m[2].replace(/,/g, ''), 10) };
+        return null;
+      }
+
+      function scoreCandidate(jdText, resumeText) {
+        const jdSkills = extractSkills(jdText);
+        const resumeSkills = extractSkills(resumeText);
+        const jdYears = extractYears(jdText);
+        const resumeYears = extractYears(resumeText);
+        const jdLocation = extractLocation(jdText);
+        const resumeLocation = extractLocation(resumeText);
+        const jdLevel = extractLevel(jdText);
+        const resumeLevel = extractLevel(resumeText);
+
+        const jdSet = new Set(jdSkills);
+        const matched = resumeSkills.filter(s => jdSet.has(s));
+        const matchedSet = new Set(matched);
+        const missing = jdSkills.filter(s => !matchedSet.has(s));
+        const extra = resumeSkills.filter(s => !jdSet.has(s));
+
+        const skillRatio = jdSkills.length > 0 ? matched.length / jdSkills.length : 0.5;
+        const yearsRatio = jdYears > 0 ? Math.min(resumeYears / jdYears, 1.2) : 1.0;
+        const locationMatch = jdLocation && resumeLocation && (jdLocation === resumeLocation || resumeLocation === 'Remote');
+        const levelMatch = jdLevel && resumeLevel && (jdLevel.toLowerCase() === resumeLevel.toLowerCase());
+
+        const skillScore = Math.round(skillRatio * 55);
+        const yearsScore = jdYears > 0 ? Math.round(yearsRatio * 25) : 18;
+        const locationScore = locationMatch ? 8 : (jdLocation ? 0 : 5);
+        const levelScore = levelMatch ? 7 : (jdLevel ? 3 : 5);
+        const bonusScore = Math.min(extra.length, 5);
+
+        const score = Math.min(100, skillScore + yearsScore + locationScore + levelScore + bonusScore);
+
+        return {
+          score,
+          matchPercent: Math.round(skillRatio * 100),
+          breakdown: [
+            { label: 'Skills match', got: skillScore, max: 55, detail: matched.length + ' of ' + jdSkills.length + ' required skills' },
+            { label: 'Years of experience', got: yearsScore, max: 25, detail: resumeYears + ' yrs vs ' + (jdYears || '—') + ' required' },
+            { label: 'Location fit', got: locationScore, max: 8, detail: locationMatch ? (resumeLocation + ' matches ' + jdLocation) : (jdLocation ? 'No location match' : 'Location not specified') },
+            { label: 'Level match', got: levelScore, max: 7, detail: levelMatch ? (resumeLevel + ' = ' + jdLevel) : (jdLevel ? 'Level differs' : 'Level not specified') },
+            { label: 'Bonus depth', got: bonusScore, max: 5, detail: extra.length + ' bonus skills' },
+          ],
+          jdSkills, resumeSkills, matched, missing, extra,
+          jdYears, resumeYears, jdLocation, resumeLocation, jdLevel, resumeLevel,
+        };
+      }
+
+      function findCitations(text, skills, limit) {
+        if (!text) return [];
+        const out = [];
+        for (const skill of skills) {
+          const pat = '([^\\n.\u2022]{0,60}' + escapeRe(skill) + '[^\\n.\u2022]{0,60})';
+          const re = new RegExp(pat, 'i');
+          const m = String(text).match(re);
+          if (m) out.push({ skill, snippet: m[1].trim() });
+          if (limit && out.length >= limit) break;
+        }
+        return out;
+      }
+
+      function highlightSkills(text, matched, missing) {
+        // Build a regex of all skills, longest first to avoid partial-match conflicts
+        if (!text) return [];
+        const all = [...new Set([...(matched||[]), ...(missing||[])])].sort((a,b) => b.length - a.length);
+        if (all.length === 0) return [text];
+        const matchedSet = new Set(matched || []);
+        const re = new RegExp('(' + all.map(escapeRe).join('|') + ')', 'gi');
+        const parts = [];
+        let lastIdx = 0;
+        let m;
+        let count = 0;
+        const safe = String(text);
+        while ((m = re.exec(safe)) !== null && count < 500) {
+          if (m.index > lastIdx) parts.push(safe.slice(lastIdx, m.index));
+          const found = m[0];
+          const lc = found.toLowerCase();
+          const tone = matchedSet.has(lc) ? 'match' : 'miss';
+          parts.push({ tone, text: found });
+          lastIdx = m.index + found.length;
+          count++;
+        }
+        if (lastIdx < safe.length) parts.push(safe.slice(lastIdx));
+        return parts;
+      }
+
+      function generateRubric(jd, resumeSkills, missing) {
+        const out = [];
+        if (missing.length > 0) {
+          out.push('Probe gap: candidate did not surface "' + missing[0] + '". Ask for project example.');
+        }
+        if (missing.length > 1) {
+          out.push('Probe gap: ask how candidate would approach a system requiring ' + missing.slice(1, 3).join(' and ') + '.');
+        }
+        out.push('Strength validation: ask for a deep-dive on ' + (resumeSkills[0] || 'their strongest skill') + '.');
+        out.push('Behavioral: describe a time you mentored a junior engineer through a tough trade-off.');
+        out.push('System design: design a service handling 10M+ daily requests with strong consistency.');
+        return out;
+      }
+
+      function generateOffer(score, comp, location, level) {
+        const base = comp ? Math.round(comp.lo + (comp.hi - comp.lo) * Math.min(1, score / 100)) : 195000;
+        return {
+          base,
+          equity: 'Competitive (4-year vest, 1-year cliff)',
+          location: location || 'NYC (Hybrid, 3 days/wk)',
+          level: level || 'Senior IC',
+          start: 'Within 30 days',
+        };
+      }
+
+      function fmtUSD(n) { return '$' + n.toLocaleString(); }
+      function shortHash() {
+        const c = '0123456789abcdef';
+        let s = '0x';
+        for (let i = 0; i < 4; i++) s += c[Math.floor(Math.random() * 16)];
+        s += '\u2026';
+        for (let i = 0; i < 2; i++) s += c[Math.floor(Math.random() * 16)];
+        return s;
+      }
+
+      /* ---------------------------------------------------------------------------
+         Mock dataset (used by Dashboard, Agents, Candidates, BiasAudit, Compliance)
+         --------------------------------------------------------------------------- */
+      const KPIS = {
+        openReqs: 142, timeToFillDays: 19, timeToFillDelta: -56,
+        costPerHire: 980, costPerHireDelta: -71,
+        ll144Status: 'Compliant', ll144AuditDate: '2026-04-18', ll144NextDue: '2027-04-18',
+      };
+
+      const FUNNEL = [
+        { stage: 'Sourced', count: 12480 }, { stage: 'Screened', count: 4120 },
+        { stage: 'Interviewed', count: 980 }, { stage: 'Offer', count: 218 }, { stage: 'Hired', count: 184 },
+      ];
+
+      const PRODUCTIVITY = [
+        { name: 'Sourcer', tasks: 12480, hoursSaved: 624 },
+        { name: 'Screener', tasks: 4120, hoursSaved: 412 },
+        { name: 'Interviewer', tasks: 980, hoursSaved: 196 },
+        { name: 'Scheduler', tasks: 1380, hoursSaved: 138 },
+        { name: 'Offer Drafter', tasks: 218, hoursSaved: 65 },
+      ];
+
+      const TREND = [
+        { day: 'D1', timeToFill: 41, ll144: 88 }, { day: 'D5', timeToFill: 38, ll144: 89 },
+        { day: 'D10', timeToFill: 34, ll144: 91 }, { day: 'D15', timeToFill: 28, ll144: 92 },
+        { day: 'D20', timeToFill: 24, ll144: 92 }, { day: 'D25', timeToFill: 21, ll144: 93 },
+        { day: 'D30', timeToFill: 19, ll144: 92 },
+      ];
+
+      const AGENTS = [
+        { id: 'sourcer', name: 'Sourcer Agent', tagline: 'Skills-graph candidate sourcing', status: 'Active', tasksToday: 412, avgTimeSec: 14, successRate: 0.94, modelVersion: 'sourcer-v2.7', sapTouchpoint: 'SuccessFactors Recruiting · Knowledge Graph', icon: 'search', tone: 'sky',
+          description: 'Searches LinkedIn, GitHub, and the customer alumni database. Uses skills-graph matching rather than keyword matching, surfacing candidates that classical ATS keyword filters miss.',
+          decisions: ['12,480 candidates sourced this period across 142 reqs','36% of shortlisted candidates were missed by keyword search','Median time from req-open to first-50: 1h 47m'] },
+        { id: 'screener', name: 'Screener Agent', tagline: 'Explainable resume + response review', status: 'Active', tasksToday: 187, avgTimeSec: 22, successRate: 0.91, modelVersion: 'screener-v3.2', sapTouchpoint: 'SuccessFactors Recruiting · AI Core · Provenance Log', icon: 'list-checks', tone: 'violet',
+          description: 'Produces an explainable score (0-100) for each candidate against the JD. Every score has a citation list (which JD requirement was matched by which resume span) and a rationale. Stored as a tamper-evident audit event.',
+          decisions: ['Recruiter override rate: 11% (logged as fairness signal)','Average decisions per req: 29','Explainability coverage: 100% of decisions have citations'] },
+        { id: 'interviewer', name: 'Interviewer Agent', tagline: 'Structured first-round screening', status: 'Active', tasksToday: 64, avgTimeSec: 1320, successRate: 0.88, modelVersion: 'interviewer-v1.9', sapTouchpoint: 'Joule chat · Optional Google Meet bridge', icon: 'message-square-dot', tone: 'emerald',
+          description: 'Runs structured first-round interviews via chat or by joining a Google Meet. Produces transcript, rubric scores per dimension, and red-flag annotations. Candidate consent is captured up front.',
+          decisions: ['980 first-round interviews completed this period','Rubric inter-rater agreement (vs human): \u03BA = 0.78','Calibration sessions logged for audit'] },
+        { id: 'scheduler', name: 'Scheduler Agent', tagline: 'Cross-timezone panel orchestration', status: 'Active', tasksToday: 98, avgTimeSec: 8, successRate: 0.97, modelVersion: 'scheduler-v1.4', sapTouchpoint: 'SuccessFactors interview blocks · Outlook · Google Calendar', icon: 'calendar-clock', tone: 'amber',
+          description: 'Books panel interviews across time zones, routes to interviewers based on calendar load and rubric coverage, and re-books on cancellation without recruiter intervention.',
+          decisions: ['Auto-resolved 92% of conflicts','Median candidate-to-panel: 36 hours','Reschedule rate: 4.1%'] },
+        { id: 'offer', name: 'Offer Drafter Agent', tagline: 'Compliant offer letter generation', status: 'Idle', tasksToday: 12, avgTimeSec: 41, successRate: 0.99, modelVersion: 'offer-v1.6', sapTouchpoint: 'S/4HANA HR · SF Compensation · DocuSign', icon: 'file-signature', tone: 'rose',
+          description: 'Pulls comp band from S/4HANA HR + SF Compensation, drafts the offer letter using the customer template, routes for approval through SAP BPA, and ships via DocuSign. Comp guardrails enforced server-side.',
+          decisions: ['218 offers drafted this period','0 out-of-band comp violations (server-side guardrail)','Average draft-to-sign: 2.4 days'] },
+      ];
+
+      const FEED_TEMPLATES = [
+        { agent: 'Sourcer', verb: 'sourced', noun: 'candidate from LinkedIn for', tone: 'sky' },
+        { agent: 'Sourcer', verb: 'matched', noun: 'GitHub profile via skills graph for', tone: 'sky' },
+        { agent: 'Screener', verb: 'scored', noun: 'application with explainability for', tone: 'violet' },
+        { agent: 'Screener', verb: 'flagged', noun: 'requirement gap on', tone: 'violet' },
+        { agent: 'Interviewer', verb: 'completed', noun: 'rubric scoring for', tone: 'emerald' },
+        { agent: 'Scheduler', verb: 'booked', noun: 'panel interview for', tone: 'amber' },
+        { agent: 'Scheduler', verb: 'resolved', noun: 'calendar conflict for', tone: 'amber' },
+        { agent: 'Offer Drafter', verb: 'drafted', noun: 'offer letter for', tone: 'rose' },
+        { agent: 'Audit Engine', verb: 'logged', noun: 'tamper-evident event for', tone: 'slate' },
+      ];
+
+      const FIRST_NAMES = ['Alicia','Marcus','Priya','Jordan','Aisha','Diego','Sora','Wen','Naomi','Olu','Lina','Daniel','Rohan','Mei','Tariq','Sofia','Imani','Caleb','Yuna','Kareem','Amara','Felix','Zara','Jin'];
+      const LAST_NAMES = ['Hernandez','Chen','Patel','Smith','Okafor','Garcia','Tanaka','Brown','Williams','Rivera','Singh','Nguyen','Davis','Cohen','Khan','Park','Adeyemi','Romero','Liu','Mensah','Schmidt','Iqbal','Choi'];
+      const ROLES = ['Senior Backend Engineer · NYC','Data Scientist · NYC (Hybrid)','SAP FICO Consultant · Remote US','Pediatric RN · Mount Sinai','Procurement Analyst · NYS OGS','Workforce Planning Lead · Marriott'];
+      const SKILLS_POOL_LIST = ['TypeScript','Python','SAP S/4HANA','ABAP','SuccessFactors','Distributed Systems','PostgreSQL','React','AWS','Kubernetes','Bias Auditing','EEOC Methodology','NetSuite','Salesforce','Snowflake','LangGraph','Causal Inference','A/B Testing','GxP','HIPAA'];
+
+      function rng(seed) { let x = Math.sin(seed) * 10000; return x - Math.floor(x); }
+      function pick(arr, seed) { return arr[Math.floor(rng(seed) * arr.length)]; }
+      function buildCandidates(n) {
+        const stages = ['Sourced','Screened','Interviewed','Offer','Hired'];
+        const out = [];
+        for (let i = 0; i < n; i++) {
+          const score = Math.round(60 + rng(i * 7 + 1) * 39);
+          const stage = stages[Math.min(stages.length-1, Math.floor(rng(i * 3 + 11) * stages.length))];
+          const skills = [];
+          for (let s = 0; s < 4; s++) {
+            const sk = pick(SKILLS_POOL_LIST, i * 13 + s * 7 + 3);
+            if (!skills.includes(sk)) skills.push(sk);
+          }
+          const fn = pick(FIRST_NAMES, i * 5 + 17);
+          const ln = pick(LAST_NAMES, i * 11 + 23);
+          out.push({
+            id: 'CND-' + (10000 + i),
+            name: fn + ' ' + ln, initials: fn[0] + ln[0],
+            role: pick(ROLES, i * 3 + 1),
+            location: pick(['NYC, NY','Brooklyn, NY','Jersey City, NJ','Remote (US)','Stamford, CT'], i + 5),
+            score, stage, skills,
+            agentDecisionAt: '2026-04-' + (10 + (i % 14)) + ' \u00B7 ' + (9 + (i % 8)) + ':' + ((i*7)%60 < 10 ? '0' : '') + ((i*7)%60) + ' AM',
+            topMatched: skills.slice(0,3),
+            gaps: [pick(['Cloud cost optimization','On-call experience','Public speaking','GxP audits','NYC residency'], i+3)],
+            rationale: 'Strong on ' + skills[0] + ' and ' + skills[1] + '; explainability citations attached; recruiter override rate on this score band: 9%.',
+          });
+        }
+        return out;
+      }
+      const CANDIDATES = buildCandidates(36);
+
+      const AUDIT_META = {
+        auditId: 'AEDT-AUDIT-2026-04-A91F2',
+        aedt: 'AuditReady Screener Agent (screener-v3.2)',
+        period: '2025-04-19 \u2192 2026-04-18',
+        auditDate: '2026-04-18', nextDue: '2027-04-18',
+        auditor: 'Independent third-party — auditor wall enforced',
+        methodology: 'EEOC Title VII / Uniform Guidelines (1978) — four-fifths rule',
+        sigSha: 'sha256:9b1f02c3e7\u2026d44a',
+      };
+      const AUDIT_BY_SEX = [
+        { group: 'Male', applicants: 6240, selected: 1880, selectionRate: 0.301 },
+        { group: 'Female', applicants: 5890, selected: 1690, selectionRate: 0.287 },
+        { group: 'Non-binary', applicants: 210, selected: 58, selectionRate: 0.276 },
+        { group: 'Prefer not to say', applicants: 140, selected: 36, selectionRate: 0.257 },
+      ];
+      const AUDIT_BY_RACE = [
+        { group: 'White', applicants: 5120, selected: 1640, selectionRate: 0.320 },
+        { group: 'Asian', applicants: 3210, selected: 990, selectionRate: 0.308 },
+        { group: 'Hispanic or Latino', applicants: 1840, selected: 522, selectionRate: 0.284 },
+        { group: 'Black or African American', applicants: 1520, selected: 376, selectionRate: 0.247 },
+        { group: 'Two or more races', applicants: 540, selected: 158, selectionRate: 0.293 },
+        { group: 'NHPI / AIAN', applicants: 250, selected: 68, selectionRate: 0.272 },
+      ];
+      const AUDIT_INTERSECTIONAL = [
+        { intersection: 'Female \u00D7 White', selectionRate: 0.317 },
+        { intersection: 'Female \u00D7 Asian', selectionRate: 0.302 },
+        { intersection: 'Female \u00D7 Hispanic', selectionRate: 0.281 },
+        { intersection: 'Female \u00D7 Black', selectionRate: 0.241 },
+        { intersection: 'Male \u00D7 White', selectionRate: 0.323 },
+        { intersection: 'Male \u00D7 Asian', selectionRate: 0.311 },
+        { intersection: 'Male \u00D7 Hispanic', selectionRate: 0.286 },
+        { intersection: 'Male \u00D7 Black', selectionRate: 0.252 },
+      ];
+      const CROSS_JURIS = [
+        { law: 'NYC Local Law 144 (AEDT)', status: 'Compliant', note: 'Annual audit on file; 10-day notices automated.' },
+        { law: 'EEOC Title VII Alignment', status: 'Compliant', note: 'Four-fifths rule applied; explainability for every decision.' },
+        { law: 'Illinois AIVIA', status: 'Compliant', note: 'Notice + bias audit aligned with NYC LL144 methodology.' },
+        { law: 'Colorado AI Act (CO SB 24-205)', status: 'Compliant', note: 'High-risk system inventory + impact assessment shipped.' },
+        { law: 'EU AI Act (high-risk HR)', status: 'In progress', note: 'Conformity package targeted Q3 2026.' },
+        { law: 'GDPR / DSAR', status: 'Compliant', note: 'DSAR endpoint live; PII minimization enforced.' },
+      ];
+      const CANDIDATE_NOTICES = [
+        { id: 'N-9211', name: 'Aisha Williams', sentAt: '2026-04-22 09:14', channel: 'Email', status: 'Delivered' },
+        { id: 'N-9210', name: 'Diego Romero', sentAt: '2026-04-22 09:01', channel: 'Email', status: 'Opened' },
+        { id: 'N-9209', name: 'Priya Patel', sentAt: '2026-04-21 17:48', channel: 'Email', status: 'Acknowledged' },
+        { id: 'N-9208', name: 'Marcus Brown', sentAt: '2026-04-21 14:22', channel: 'SMS + Email', status: 'Alt path requested' },
+        { id: 'N-9207', name: 'Yuna Park', sentAt: '2026-04-21 10:05', channel: 'Email', status: 'Delivered' },
+        { id: 'N-9206', name: 'Kareem Khan', sentAt: '2026-04-20 16:39', channel: 'Email', status: 'Delivered' },
+      ];
+      const SAP_INTEGRATIONS = [
+        { name: 'SAP SuccessFactors Recruiting', status: 'Healthy', latencyMs: 142, lastSync: '2 min ago' },
+        { name: 'SAP SuccessFactors Employee Central', status: 'Healthy', latencyMs: 188, lastSync: '4 min ago' },
+        { name: 'SAP SuccessFactors Onboarding 2.0', status: 'Healthy', latencyMs: 209, lastSync: '6 min ago' },
+        { name: 'SAP S/4HANA HR (Compensation)', status: 'Healthy', latencyMs: 121, lastSync: '1 min ago' },
+        { name: 'SAP BTP — AI Core / AI Launchpad', status: 'Healthy', latencyMs: 88, lastSync: 'live' },
+        { name: 'SAP Joule (Conversational Surface)', status: 'Healthy', latencyMs: 76, lastSync: 'live' },
+        { name: 'SAP Knowledge Graph (Skills)', status: 'Healthy', latencyMs: 93, lastSync: '3 min ago' },
+        { name: 'SAP GRC (Segregation-of-Duties)', status: 'Healthy', latencyMs: 110, lastSync: '5 min ago' },
+      ];
+      const AUDIT_LOG = [
+        { ts: '2026-04-25 11:48:12', actor: 'Screener Agent', action: 'Scored CND-10412 \u2192 87/100', ev: '0xa8\u2026f2' },
+        { ts: '2026-04-25 11:47:55', actor: 'Recruiter (Lopez, J.)', action: 'Override on CND-10408 (reason: localized exp)', ev: '0xc3\u202691' },
+        { ts: '2026-04-25 11:47:31', actor: 'Sourcer Agent', action: 'Sourced 47 candidates for REQ-204', ev: '0x12\u20268a' },
+        { ts: '2026-04-25 11:46:09', actor: 'Audit Engine', action: 'Hash-chain checkpoint written (block #21,482)', ev: '0xee\u202601' },
+        { ts: '2026-04-25 11:45:37', actor: 'Scheduler Agent', action: 'Booked panel for CND-10399', ev: '0x77\u2026b4' },
+        { ts: '2026-04-25 11:44:18', actor: 'Notice Service', action: 'Sent LL144 10-day notice to CND-10412', ev: '0x4d\u202622' },
+        { ts: '2026-04-25 11:43:02', actor: 'Offer Drafter Agent', action: 'Drafted offer for CND-10381 (within band)', ev: '0xb0\u2026ce' },
+        { ts: '2026-04-25 11:42:44', actor: 'Audit Engine', action: 'Re-ran rolling four-fifths check \u2014 PASS', ev: '0x99\u20260d' },
+      ];
+
+      /* ---------------------------------------------------------------------------
+         UI primitives
+         --------------------------------------------------------------------------- */
+      function Icon({ name, className }) {
+        return <i data-lucide={name} className={className || 'h-4 w-4'} />;
+      }
+      function Card({ className, children, padded = true }) {
+        return <div className={classNames('rounded-xl border border-surface-200 bg-white shadow-soft', padded && 'p-5', className)}>{children}</div>;
+      }
+      function Pill({ tone = 'slate', children, dot, className }) {
+        const tones = {
+          slate: 'bg-surface-100 text-ink-700 border-surface-200',
+          brand: 'bg-brand-50 text-brand-700 border-brand-100',
+          ok: 'bg-ok-50 text-ok-700 border-ok-100',
+          sky: 'bg-sky-50 text-sky-700 border-sky-100',
+          violet: 'bg-violet-50 text-violet-700 border-violet-100',
+          emerald: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+          amber: 'bg-amber-50 text-amber-700 border-amber-100',
+          rose: 'bg-rose-50 text-rose-700 border-rose-100',
+          danger: 'bg-danger-100 text-danger-600 border-rose-200',
+          ink: 'bg-ink-900 text-white border-ink-900',
+          warn: 'bg-warn-50 text-warn-700 border-warn-100',
+        };
+        const dotTones = { slate: 'bg-slate-400', brand: 'bg-brand-500', ok: 'bg-ok-500', sky: 'bg-sky-500', violet: 'bg-violet-500', emerald: 'bg-emerald-500', amber: 'bg-amber-500', rose: 'bg-rose-500', danger: 'bg-danger-500', ink: 'bg-white', warn: 'bg-warn-500' };
+        return (
+          <span className={classNames('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium', tones[tone] || tones.slate, className)}>
+            {dot && <span className={classNames('h-1.5 w-1.5 rounded-full pulse-dot', dotTones[tone])}></span>}
+            {children}
+          </span>
+        );
+      }
+      function StatCard({ label, value, delta, deltaLabel, icon, tone = 'ink' }) {
+        const positive = typeof delta === 'number' && delta < 0;
+        const negative = typeof delta === 'number' && delta > 0;
+        const deltaStr = typeof delta === 'number' ? (delta > 0 ? '+' : '') + delta + '%' : delta;
+        return (
+          <Card className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-wide text-ink-600">{label}</div>
+              <div className={classNames('flex h-8 w-8 items-center justify-center rounded-lg', tone === 'ok' ? 'bg-ok-50 text-ok-600' : tone === 'brand' ? 'bg-brand-50 text-brand-600' : 'bg-surface-100 text-ink-700')}>
+                <Icon name={icon} className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="flex items-end gap-2">
+              <div className="text-3xl font-bold tracking-tight text-ink-900">{value}</div>
+              {delta !== undefined && (
+                <div className={classNames('mb-1 inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-semibold', positive ? 'bg-ok-50 text-ok-700' : negative ? 'bg-danger-100 text-danger-600' : 'bg-surface-100 text-ink-600')}>
+                  <Icon name={positive ? 'arrow-down-right' : negative ? 'arrow-up-right' : 'minus'} className="h-3 w-3" />
+                  {deltaStr}
+                </div>
+              )}
+            </div>
+            {deltaLabel && <div className="text-xs text-ink-600">{deltaLabel}</div>}
+          </Card>
+        );
+      }
+      function Stat({ label, value }) {
+        return (
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">{label}</div>
+            <div className="mt-0.5 font-semibold text-ink-900">{value}</div>
+          </div>
+        );
+      }
+      function ProgressBar({ value, max, tone = 'brand' }) {
+        const pct = Math.min(100, Math.round((value / max) * 100));
+        const t = ({ brand: 'bg-brand-500', ok: 'bg-ok-500', warn: 'bg-warn-500', danger: 'bg-danger-500', ink: 'bg-ink-900' })[tone] || 'bg-ink-900';
+        return (
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-200">
+            <div className={classNames('h-full rounded-full transition-all duration-700', t)} style={{ width: pct + '%' }} />
+          </div>
+        );
+      }
+      function toneBg(color) {
+        return ({ sky: 'bg-sky-50 text-sky-600', violet: 'bg-violet-50 text-violet-600', emerald: 'bg-emerald-50 text-emerald-600', amber: 'bg-amber-50 text-amber-600', rose: 'bg-rose-50 text-rose-600' })[color] || 'bg-surface-100 text-ink-700';
+      }
+      function fmtSec(s) { if (s < 60) return s + 's'; const m = Math.floor(s/60); const r = s%60; return r === 0 ? m + 'm' : m + 'm ' + r + 's'; }
+      function pillToneForStage(stage) { return ({ Sourced: 'sky', Screened: 'violet', Interviewed: 'emerald', Offer: 'amber', Hired: 'ok' })[stage] || 'slate'; }
+      function dotColor(t) { return ({ sky: 'bg-sky-500', violet: 'bg-violet-500', emerald: 'bg-emerald-500', amber: 'bg-amber-500', rose: 'bg-rose-500', slate: 'bg-slate-500' })[t] || 'bg-slate-500'; }
+
+      /* ---------------------------------------------------------------------------
+         Layout: Sidebar + Topbar
+         --------------------------------------------------------------------------- */
+      const NAV = [
+        { id: 'demo', label: 'Live Demo', icon: 'play-circle', badge: 'Try it' },
+        { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+        { id: 'agents', label: 'AI Agents', icon: 'bot' },
+        { id: 'candidates', label: 'Candidates', icon: 'users' },
+        { id: 'audit', label: 'Bias Audit (LL144)', icon: 'shield-check' },
+        { id: 'compliance', label: 'Compliance', icon: 'gavel' },
+        { id: 'fit', label: 'Why this fits', icon: 'sparkles' },
+      ];
+
+      function Sidebar({ active, setActive }) {
+        return (
+          <aside className="flex w-64 shrink-0 flex-col border-r border-ink-800/40 bg-ink-900 text-white">
+            <div className="flex items-center gap-3 px-5 py-5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-ok-500 text-white shadow-glow">
+                <Icon name="shield-check" className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-base font-bold tracking-tight">AuditReady</div>
+                <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">Working Demo</div>
+              </div>
+            </div>
+
+            <nav className="mt-2 flex-1 space-y-1 px-3">
+              {NAV.map((item) => {
+                const isActive = active === item.id;
+                return (
+                  <button key={item.id} onClick={() => setActive(item.id)} className={classNames(
+                    'group flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition',
+                    isActive ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5 hover:text-white'
+                  )}>
+                    <span className="flex items-center gap-3">
+                      <Icon name={item.icon} className={classNames('h-[18px] w-[18px]', isActive ? 'text-brand-500' : 'text-white/60 group-hover:text-white')} />
+                      {item.label}
+                    </span>
+                    {item.badge && (
+                      <span className="rounded-full bg-brand-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-100">{item.badge}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div className="border-t border-white/10 px-4 py-4 space-y-3">
+              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/60">System status</div>
+                <SidebarStatus label="Agent pipeline" tone="ok" />
+                <SidebarStatus label="Audit engine" tone="ok" />
+                <SidebarStatus label="SAP integrations" tone="ok" />
+              </div>
+              <div className="flex items-center gap-2 px-1">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/20 text-xs font-semibold text-brand-100">DV</div>
+                <div className="text-xs">
+                  <div className="font-semibold">Demo viewer</div>
+                  <div className="text-white/60">Independent auditor</div>
+                </div>
+              </div>
+            </div>
+          </aside>
+        );
+      }
+      function SidebarStatus({ label, tone }) {
+        return (
+          <div className="flex items-center justify-between py-1 text-[12px] text-white/80">
+            <span>{label}</span>
+            <span className="inline-flex items-center gap-1.5"><span className={classNames('h-1.5 w-1.5 rounded-full pulse-dot', tone === 'ok' ? 'bg-ok-500' : 'bg-warn-500')} /><span className={tone === 'ok' ? 'text-ok-100' : 'text-warn-100'}>OK</span></span>
+          </div>
+        );
+      }
+
+      function Topbar({ titleEyebrow, title, subtitle, right, theme, onToggleTheme }) {
+        const isDark = theme === 'dark';
+        return (
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-surface-200 bg-white/70 px-8 py-5 backdrop-blur">
+            <div>
+              {titleEyebrow && <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-600">{titleEyebrow}</div>}
+              <h1 className="text-2xl font-bold tracking-tight text-ink-900">{title}</h1>
+              {subtitle && <p className="mt-1 max-w-3xl text-sm text-ink-600">{subtitle}</p>}
+            </div>
+            <div className="flex items-center gap-2">
+              {right}
+              <button
+                type="button"
+                onClick={onToggleTheme}
+                title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                className="theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-lg border border-surface-200 bg-white text-ink-700 hover:bg-surface-50"
+              >
+                <Icon name={isDark ? 'sun' : 'moon'} className="h-4 w-4" />
+              </button>
+              <button className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-50">
+                <Icon name="bell" className="h-3.5 w-3.5" /> 3 alerts
+              </button>
+              <span className="hidden md:inline-flex"><Pill tone="ok" dot>Live</Pill></span>
+            </div>
+          </div>
+        );
+      }
+
+      /* ---------------------------------------------------------------------------
+         Page: Live Demo (the star — real-time pipeline)
+         --------------------------------------------------------------------------- */
+      const PIPELINE_STEPS = [
+        { id: 'sourcer',    name: 'Sourcer Agent',     subtitle: 'Parsing JD & resume, extracting skills', delay: 1100, icon: 'search', tone: 'sky' },
+        { id: 'screener',   name: 'Screener Agent',    subtitle: 'Computing explainable score with citations', delay: 1900, icon: 'list-checks', tone: 'violet' },
+        { id: 'rubric',     name: 'Interviewer Prep',  subtitle: 'Generating rubric for first-round screen', delay: 1100, icon: 'message-square-dot', tone: 'emerald' },
+        { id: 'scheduler',  name: 'Scheduler Agent',   subtitle: 'Allocating panel slot across timezones', delay: 700,  icon: 'calendar-clock', tone: 'amber' },
+        { id: 'offer',      name: 'Offer Drafter',     subtitle: 'Drafting offer in approved comp band', delay: 1100, icon: 'file-signature', tone: 'rose' },
+        { id: 'audit',      name: 'Audit Engine',      subtitle: 'Hash-chained event written to LL144 log', delay: 500,  icon: 'shield-check', tone: 'slate' },
+      ];
+
+      function LiveDemoPage() {
+        const [jd, setJd] = useState('');
+        const [resume, setResume] = useState('');
+        const [phase, setPhase] = useState('idle'); // idle | running | done
+        const [stepIdx, setStepIdx] = useState(-1);
+        const [result, setResult] = useState(null);
+        const [elapsedMs, setElapsedMs] = useState(0);
+        const [tick, setTick] = useState(0);
+        const startedAtRef = useRef(0);
+        const tickerRef = useRef(null);
+
+        const onSample = () => { setJd(SAMPLE_JD); setResume(SAMPLE_RESUME); };
+        const onClear = () => { setJd(''); setResume(''); setResult(null); setPhase('idle'); setStepIdx(-1); setElapsedMs(0); };
+
+        const run = () => {
+          if (!jd.trim() || !resume.trim()) return;
+          const computed = scoreCandidate(jd, resume);
+          const offer = generateOffer(computed.score, extractComp(jd), computed.jdLocation, computed.jdLevel);
+          const rubric = generateRubric(jd, computed.resumeSkills, computed.missing);
+          const citations = findCitations(resume, computed.matched, 5);
+          const fullResult = { ...computed, offer, rubric, citations, candidateId: 'CND-' + Math.floor(10000 + Math.random() * 90000), startedAt: new Date() };
+          setResult(fullResult);
+          setPhase('running');
+          setStepIdx(-1);
+          setElapsedMs(0);
+          startedAtRef.current = performance.now();
+          if (tickerRef.current) clearInterval(tickerRef.current);
+          tickerRef.current = setInterval(() => {
+            setElapsedMs(performance.now() - startedAtRef.current);
+            setTick(t => t + 1);
+          }, 80);
+          let acc = 0;
+          PIPELINE_STEPS.forEach((s, i) => {
+            acc += s.delay;
+            setTimeout(() => setStepIdx(i), acc);
+          });
+          setTimeout(() => {
+            setPhase('done');
+            if (tickerRef.current) clearInterval(tickerRef.current);
+          }, acc + 400);
+        };
+
+        useEffect(() => () => { if (tickerRef.current) clearInterval(tickerRef.current); }, []);
+
+        return (
+          <div className="space-y-6">
+            <DemoHero phase={phase} onRun={run} onSample={onSample} onClear={onClear} canRun={!!(jd.trim() && resume.trim())} />
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <DemoInput label="Job Description" placeholder="Paste a JD, or click 'Use sample'." value={jd} onChange={setJd} disabled={phase === 'running'} icon="briefcase" highlight={result && phase !== 'idle'} parts={result && phase !== 'idle' ? highlightSkills(jd, result.matched, result.missing) : null} />
+              <DemoInput label="Candidate Resume" placeholder="Paste a resume, or click 'Use sample'." value={resume} onChange={setResume} disabled={phase === 'running'} icon="file-text" highlight={result && phase !== 'idle'} parts={result && phase !== 'idle' ? highlightSkills(resume, result.matched, []) : null} />
+            </div>
+
+            {phase !== 'idle' && (
+              <Pipeline phase={phase} stepIdx={stepIdx} elapsedMs={elapsedMs} result={result} />
+            )}
+
+            {phase === 'done' && result && (
+              <Fragment>
+                <ResultsHeader result={result} />
+                <ResultsBody result={result} />
+                <ProductivityReport elapsedMs={elapsedMs} score={result.score} />
+              </Fragment>
+            )}
+          </div>
+        );
+      }
+
+      function DemoHero({ phase, onRun, onSample, onClear, canRun }) {
+        return (
+          <div className="relative overflow-hidden rounded-2xl border border-surface-200 bg-gradient-to-br from-ink-900 via-ink-900 to-ink-800 p-8 text-white shadow-card">
+            <div className="pointer-events-none absolute inset-0 grid-pattern opacity-20" />
+            <div className="relative grid grid-cols-1 items-center gap-8 lg:grid-cols-5">
+              <div className="lg:col-span-3 space-y-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-100">
+                  <span className="h-1.5 w-1.5 rounded-full bg-ok-500 pulse-dot" />
+                  Real pipeline · runs in your browser
+                </div>
+                <h2 className="text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+                  Paste a <span className="gradient-text">job description</span> and a <span className="gradient-text">resume</span>.<br />
+                  Watch six AI agents do four hours of recruiter work in seconds.
+                </h2>
+                <p className="max-w-2xl text-sm leading-relaxed text-white/70">
+                  Every step is logged for audit. Every score is explainable. Every decision is hash-chained into a tamper-evident log designed for NYC Local Law 144 and EEOC scrutiny.
+                </p>
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button onClick={onRun} disabled={!canRun || phase === 'running'} className={classNames('group inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold shadow-glow transition', canRun && phase !== 'running' ? 'bg-brand-500 text-white hover:bg-brand-600' : 'cursor-not-allowed bg-white/10 text-white/50')}>
+                    <Icon name="play" className="h-4 w-4" /> {phase === 'running' ? 'Pipeline running…' : phase === 'done' ? 'Run again' : 'Run pipeline'}
+                  </button>
+                  <button onClick={onSample} className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10">
+                    <Icon name="wand-sparkles" className="h-4 w-4" /> Use sample
+                  </button>
+                  <button onClick={onClear} className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-transparent px-4 py-3 text-sm font-semibold text-white/80 hover:bg-white/5">
+                    <Icon name="rotate-ccw" className="h-4 w-4" /> Clear
+                  </button>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 pt-2 text-[11px] text-white/60">
+                  <span className="inline-flex items-center gap-1.5"><Icon name="zap" className="h-3 w-3 text-brand-100" /> Skills graph</span>
+                  <span className="inline-flex items-center gap-1.5"><Icon name="bookmark-check" className="h-3 w-3 text-ok-500" /> Citations</span>
+                  <span className="inline-flex items-center gap-1.5"><Icon name="lock" className="h-3 w-3 text-ok-500" /> Tamper-evident</span>
+                  <span className="inline-flex items-center gap-1.5"><Icon name="scale" className="h-3 w-3 text-ok-500" /> 4/5 rule logged</span>
+                </div>
+              </div>
+              <div className="hidden lg:col-span-2 lg:block">
+                <div className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+                  <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/60">What you'll see</div>
+                  <ul className="space-y-2 text-sm">
+                    {[
+                      'Real skill extraction (no LLM call needed)',
+                      'Explainable score with breakdown',
+                      'Highlighted matches in JD & resume',
+                      'Auto-drafted offer letter',
+                      'LL144 audit log entry',
+                      'Productivity & cost savings'
+                    ].map((it, i) => (
+                      <li key={i} className="flex items-start gap-2 text-white/85">
+                        <Icon name="check" className="mt-0.5 h-4 w-4 text-ok-500" />
+                        {it}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function DemoInput({ label, placeholder, value, onChange, disabled, icon, highlight, parts }) {
+        return (
+          <Card padded={false} className="overflow-hidden">
+            <div className="flex items-center justify-between border-b border-surface-200 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                <Icon name={icon} className="h-4 w-4 text-ink-600" /> {label}
+              </div>
+              <div className="text-[11px] text-ink-600">{value ? value.length.toLocaleString() + ' chars' : 'empty'}</div>
+            </div>
+            {highlight && parts ? (
+              <div className="scroll-soft max-h-[420px] overflow-y-auto whitespace-pre-wrap break-words p-4 font-mono text-[12.5px] leading-relaxed text-ink-800">
+                {parts.map((p, i) => (typeof p === 'string'
+                  ? <span key={i}>{p}</span>
+                  : <mark key={i} className={p.tone === 'match' ? 'skill-mark' : 'skill-mark-miss'}>{p.text}</mark>))}
+              </div>
+            ) : (
+              <textarea
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                disabled={disabled}
+                placeholder={placeholder}
+                rows={16}
+                className="block w-full resize-none border-0 bg-white px-4 py-3 font-mono text-[12.5px] leading-relaxed text-ink-800 placeholder:text-ink-400 focus:ring-0"
+              />
+            )}
+          </Card>
+        );
+      }
+
+      function Pipeline({ phase, stepIdx, elapsedMs, result }) {
+        return (
+          <Card>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <div className="text-sm font-semibold text-ink-900">Live agent pipeline</div>
+                <div className="text-xs text-ink-600">Six agents collaborating. Every action is logged.</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="font-mono text-xs text-ink-600">Elapsed: {(elapsedMs/1000).toFixed(2)}s</div>
+                <Pill tone={phase === 'done' ? 'ok' : 'brand'} dot>{phase === 'done' ? 'Complete' : 'Running'}</Pill>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {PIPELINE_STEPS.map((s, i) => {
+                const state = i < stepIdx ? 'done' : i === stepIdx ? 'running' : 'pending';
+                if (phase === 'done') {
+                  // mark all as done at end for clarity
+                }
+                return <PipelineStep key={s.id} step={s} state={state} idx={i} result={result} />;
+              })}
+            </div>
+          </Card>
+        );
+      }
+
+      function PipelineStep({ step, state, idx, result }) {
+        const stateBg = state === 'done' ? 'border-ok-100 bg-ok-50/50' : state === 'running' ? 'border-brand-100 bg-brand-50/50' : 'border-surface-200 bg-white';
+        const statusIcon = state === 'done' ? 'check-circle-2' : state === 'running' ? 'loader-2' : 'circle';
+        const statusColor = state === 'done' ? 'text-ok-500' : state === 'running' ? 'text-brand-500 animate-spin' : 'text-ink-400';
+        return (
+          <div className={classNames('relative rounded-xl border p-4 transition-all duration-500', stateBg, state !== 'pending' && 'animate-fadeUp')}>
+            <div className="flex items-start gap-4">
+              <div className="relative">
+                <div className={classNames('flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg', toneBg(step.tone))}>
+                  <Icon name={step.icon} className="h-5 w-5" />
+                </div>
+                {idx < PIPELINE_STEPS.length - 1 && <div className={classNames('step-line', state === 'done' && 'step-line-active')} />}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <div className="text-sm font-semibold text-ink-900">Step {idx + 1} · {step.name}</div>
+                    <div className="text-xs text-ink-600">{step.subtitle}</div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <Icon name={statusIcon} className={classNames('h-4 w-4', statusColor)} />
+                    <span className={classNames('font-medium', state === 'done' ? 'text-ok-700' : state === 'running' ? 'text-brand-700' : 'text-ink-500')}>
+                      {state === 'done' ? 'Complete' : state === 'running' ? 'Running…' : 'Queued'}
+                    </span>
+                  </div>
+                </div>
+                {state !== 'pending' && result && <PipelineStepDetail step={step} result={result} />}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function PipelineStepDetail({ step, result }) {
+        if (step.id === 'sourcer') {
+          return (
+            <div className="mt-3 grid grid-cols-1 gap-2 text-xs sm:grid-cols-3">
+              <DetailKV k="JD skills extracted" v={result.jdSkills.length} />
+              <DetailKV k="Resume skills extracted" v={result.resumeSkills.length} />
+              <DetailKV k="Years required vs in-resume" v={(result.jdYears || '—') + ' \u2192 ' + (result.resumeYears || '—')} />
+              <div className="sm:col-span-3">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">Required skills detected</div>
+                <div className="mt-1 flex flex-wrap gap-1">{result.jdSkills.slice(0, 12).map((s) => <SkillChip key={s} skill={s} matched={result.matched.includes(s)} />)}</div>
+              </div>
+            </div>
+          );
+        }
+        if (step.id === 'screener') {
+          return (
+            <div className="mt-3 space-y-3">
+              <div className="flex items-center gap-3">
+                <ScoreBadge score={result.score} />
+                <div className="flex-1">
+                  <div className="mb-1 flex items-center justify-between text-xs"><span className="font-semibold text-ink-700">Match strength</span><span className="font-mono text-ink-900">{result.matchPercent}%</span></div>
+                  <ProgressBar value={result.matchPercent} max={100} tone={result.score >= 80 ? 'ok' : result.score >= 60 ? 'warn' : 'danger'} />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-5">
+                {result.breakdown.map((b) => (
+                  <div key={b.label} className="rounded-lg border border-surface-200 bg-white p-2.5">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">{b.label}</div>
+                    <div className="mt-1 flex items-baseline gap-1"><span className="text-lg font-bold text-ink-900">{b.got}</span><span className="text-xs text-ink-500">/{b.max}</span></div>
+                    <div className="mt-1 text-[11px] text-ink-600">{b.detail}</div>
+                  </div>
+                ))}
+              </div>
+              {result.citations.length > 0 && (
+                <div className="rounded-lg border border-surface-200 bg-white p-3">
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-ink-600">Top citations from resume</div>
+                  <ul className="space-y-1.5 text-xs">
+                    {result.citations.slice(0, 4).map((c, i) => (
+                      <li key={i} className="flex items-start gap-2 text-ink-700">
+                        <Icon name="quote" className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-ok-600" />
+                        <span><span className="rounded bg-ok-50 px-1 py-0.5 font-semibold text-ok-700">{c.skill}</span> — “{c.snippet}”</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          );
+        }
+        if (step.id === 'rubric') {
+          return (
+            <div className="mt-3">
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-600">Generated interview rubric (5 questions)</div>
+              <ul className="space-y-1 text-xs text-ink-700">
+                {result.rubric.map((q, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">{i+1}</span>
+                    <span>{q}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        }
+        if (step.id === 'scheduler') {
+          const slots = ['Tue 10:00 AM ET','Wed 2:30 PM ET','Thu 11:00 AM ET'];
+          return (
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {slots.map((s, i) => (
+                <div key={s} className={classNames('rounded-lg border p-2.5 text-xs', i === 0 ? 'border-amber-200 bg-amber-50' : 'border-surface-200 bg-white')}>
+                  <div className="flex items-center justify-between"><span className="font-semibold text-ink-900">{s}</span>{i === 0 && <Icon name="check-circle-2" className="h-3.5 w-3.5 text-amber-700" />}</div>
+                  <div className="mt-0.5 text-ink-600">{i === 0 ? 'Selected · panel of 3 confirmed' : 'Alternative slot'}</div>
+                </div>
+              ))}
+            </div>
+          );
+        }
+        if (step.id === 'offer') {
+          if (result.score < 75) {
+            return <div className="mt-3 text-xs text-amber-700">Score below threshold (75) — offer step skipped. Recruiter will manually review.</div>;
+          }
+          return (
+            <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+              <div className="rounded-lg border border-surface-200 bg-white p-2.5"><div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">Base</div><div className="mt-1 text-base font-bold text-ink-900">{fmtUSD(result.offer.base)}</div></div>
+              <div className="rounded-lg border border-surface-200 bg-white p-2.5"><div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">Equity</div><div className="mt-1 text-[12px] text-ink-900">{result.offer.equity}</div></div>
+              <div className="rounded-lg border border-surface-200 bg-white p-2.5"><div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">Location</div><div className="mt-1 text-[12px] text-ink-900">{result.offer.location}</div></div>
+              <div className="rounded-lg border border-surface-200 bg-white p-2.5"><div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">Start</div><div className="mt-1 text-[12px] text-ink-900">{result.offer.start}</div></div>
+            </div>
+          );
+        }
+        if (step.id === 'audit') {
+          return (
+            <div className="mt-3 rounded-lg border border-ok-100 bg-ok-50 p-3 text-xs text-ok-700">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="font-semibold">Event written.</span>
+                <span className="font-mono text-[11px]">decision_id={result.candidateId}</span>
+                <span className="font-mono text-[11px]">prev={shortHash()}</span>
+                <span className="font-mono text-[11px]">this={shortHash()}</span>
+                <span className="font-mono text-[11px]">model=screener-v3.2</span>
+              </div>
+              <div className="mt-1 text-[11px] text-ok-600">10-day candidate notice queued for delivery (Local Law 144 §20-871-c).</div>
+            </div>
+          );
+        }
+        return null;
+      }
+
+      function DetailKV({ k, v }) {
+        return (
+          <div className="rounded-lg border border-surface-200 bg-white p-2.5">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">{k}</div>
+            <div className="mt-0.5 text-sm font-bold text-ink-900">{v}</div>
+          </div>
+        );
+      }
+
+      function SkillChip({ skill, matched }) {
+        return (
+          <span className={classNames('inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[11px] font-medium',
+            matched ? 'border-ok-100 bg-ok-50 text-ok-700' : 'border-amber-100 bg-amber-50 text-amber-700')}>
+            <Icon name={matched ? 'check' : 'minus'} className="h-2.5 w-2.5" /> {skill}
+          </span>
+        );
+      }
+
+      function ScoreBadge({ score }) {
+        const tone = score >= 90 ? 'ok' : score >= 75 ? 'brand' : score >= 60 ? 'warn' : 'danger';
+        const toneClass = ({ ok: 'border-ok-100 bg-gradient-to-br from-ok-50 to-white text-ok-700', brand: 'border-brand-100 bg-gradient-to-br from-brand-50 to-white text-brand-700', warn: 'border-warn-100 bg-gradient-to-br from-warn-50 to-white text-warn-700', danger: 'border-danger-100 bg-danger-50 text-danger-600' })[tone];
+        return (
+          <div className={classNames('flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-xl border', toneClass)}>
+            <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80">Score</div>
+            <div className="text-2xl font-bold leading-none">{score}</div>
+          </div>
+        );
+      }
+
+      function ResultsHeader({ result }) {
+        const recommend = result.score >= 90 ? 'Strong proceed' : result.score >= 75 ? 'Proceed' : result.score >= 60 ? 'Borderline — recruiter review' : 'Likely decline';
+        const recTone = result.score >= 90 ? 'ok' : result.score >= 75 ? 'brand' : result.score >= 60 ? 'warn' : 'danger';
+        return (
+          <Card className="animate-fadeUp">
+            <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+              <div className="flex items-center gap-4">
+                <ScoreBadge score={result.score} />
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-600">Recommendation</div>
+                  <div className="text-xl font-bold text-ink-900">{recommend}</div>
+                  <div className="text-xs text-ink-600">{result.matched.length} of {result.jdSkills.length} required skills matched · candidate {result.candidateId}</div>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button className="inline-flex items-center gap-1.5 rounded-lg bg-ink-900 px-3 py-2 text-xs font-semibold text-white hover:bg-ink-800"><Icon name="thumbs-up" className="h-3.5 w-3.5" /> Advance to next stage</button>
+                <button className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-50"><Icon name="message-square-text" className="h-3.5 w-3.5" /> Override (logged)</button>
+                <button className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-50"><Icon name="external-link" className="h-3.5 w-3.5" /> Open in SuccessFactors</button>
+              </div>
+            </div>
+          </Card>
+        );
+      }
+
+      function ResultsBody({ result }) {
+        return (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <Card>
+              <div className="mb-2 text-sm font-semibold text-ink-900">Matched skills <span className="text-xs font-normal text-ok-700">({result.matched.length})</span></div>
+              <div className="flex flex-wrap gap-1">{result.matched.map(s => <SkillChip key={s} skill={s} matched={true} />)}</div>
+              {result.matched.length === 0 && <div className="text-xs text-ink-600">No matches.</div>}
+            </Card>
+            <Card>
+              <div className="mb-2 text-sm font-semibold text-ink-900">Gaps <span className="text-xs font-normal text-amber-700">({result.missing.length})</span></div>
+              <div className="flex flex-wrap gap-1">{result.missing.map(s => <SkillChip key={s} skill={s} matched={false} />)}</div>
+              {result.missing.length === 0 && <div className="text-xs text-ink-600">No gaps. Excellent.</div>}
+            </Card>
+            <Card>
+              <div className="mb-2 text-sm font-semibold text-ink-900">Bonus depth <span className="text-xs font-normal text-brand-700">({result.extra.length})</span></div>
+              <div className="flex flex-wrap gap-1">{result.extra.slice(0, 12).map(s => (<span key={s} className="inline-flex items-center gap-1 rounded-md border border-brand-100 bg-brand-50 px-1.5 py-0.5 text-[11px] font-medium text-brand-700"><Icon name="plus" className="h-2.5 w-2.5" /> {s}</span>))}</div>
+              {result.extra.length === 0 && <div className="text-xs text-ink-600">No bonus skills detected.</div>}
+            </Card>
+          </div>
+        );
+      }
+
+      function ProductivityReport({ elapsedMs, score }) {
+        const HUMAN_MIN_PER_CANDIDATE = 47; // industry-typical recruiter minutes per candidate for full screen
+        const HUMAN_COST = 295;             // loaded recruiter cost per candidate ($)
+        const aiSec = elapsedMs / 1000;
+        const humanSec = HUMAN_MIN_PER_CANDIDATE * 60;
+        const speedup = Math.round(humanSec / Math.max(aiSec, 0.1));
+        const annualVolume = 10000;
+        const annualSaved = HUMAN_COST * annualVolume - 0.50 * annualVolume; // assume $0.50 LLM cost per candidate
+        return (
+          <Card className="animate-fadeUp border-brand-100 bg-gradient-to-br from-brand-50 via-white to-ok-50">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-600">Productivity report</div>
+                <div className="text-lg font-bold text-ink-900">What this means for the company</div>
+              </div>
+              <Pill tone="brand">Per candidate</Pill>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <BigStat label="Pipeline runtime" value={aiSec.toFixed(2) + 's'} tone="brand" icon="zap" />
+              <BigStat label="Manual recruiter time" value={HUMAN_MIN_PER_CANDIDATE + ' min'} tone="ink" icon="clock" />
+              <BigStat label="Speedup" value={speedup.toLocaleString() + '\u00D7'} tone="ok" icon="rocket" />
+              <BigStat label="Cost saved" value={fmtUSD(HUMAN_COST - 1)} tone="ok" icon="dollar-sign" />
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div className="rounded-lg border border-surface-200 bg-white p-4">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-600">If the company processes 10,000 candidates/year</div>
+                <div className="mt-1 text-2xl font-bold text-ink-900">{fmtUSD(annualSaved)} <span className="text-sm font-normal text-ok-700">annual savings</span></div>
+                <div className="mt-1 text-xs text-ink-600">Recruiter loaded cost ~${HUMAN_COST}/candidate × 10,000 = {fmtUSD(HUMAN_COST * annualVolume)} → minus AI cost (~$0.50/candidate)</div>
+              </div>
+              <div className="rounded-lg border border-surface-200 bg-white p-4">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-600">Compliance posture</div>
+                <div className="mt-1 flex items-center gap-2 text-sm font-semibold text-ok-700"><Icon name="shield-check" className="h-4 w-4" /> Decision logged for NYC Local Law 144 audit</div>
+                <div className="mt-1 text-xs text-ink-600">10-day candidate notice queued · explainability citations attached · model version pinned · hash-chained.</div>
+              </div>
+            </div>
+          </Card>
+        );
+      }
+
+      function BigStat({ label, value, tone, icon }) {
+        const t = ({ brand: 'text-brand-700 bg-brand-50', ok: 'text-ok-700 bg-ok-50', ink: 'text-ink-900 bg-surface-100' })[tone];
+        return (
+          <div className="rounded-lg border border-surface-200 bg-white p-4">
+            <div className="flex items-center gap-2">
+              <div className={classNames('flex h-7 w-7 items-center justify-center rounded-md', t)}><Icon name={icon} className="h-3.5 w-3.5" /></div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">{label}</div>
+            </div>
+            <div className="mt-2 text-xl font-bold text-ink-900">{value}</div>
+          </div>
+        );
+      }
+
+      /* ---------------------------------------------------------------------------
+         Page: Dashboard
+         --------------------------------------------------------------------------- */
+      function DashboardPage() {
+        const k = KPIS;
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <StatCard label="Open requisitions" value={k.openReqs} icon="briefcase" deltaLabel="across 14 business units" />
+              <StatCard label="Time to fill" value={k.timeToFillDays + ' days'} delta={k.timeToFillDelta} icon="clock" tone="ok" />
+              <StatCard label="Cost per hire" value={'$' + k.costPerHire.toLocaleString()} delta={k.costPerHireDelta} icon="dollar-sign" tone="ok" />
+              <StatCard label="LL144 status" value={k.ll144Status} icon="shield-check" tone="ok" deltaLabel={'Audited ' + k.ll144AuditDate + ' \u00B7 Next due ' + k.ll144NextDue} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-ink-900">Time-to-fill trend & LL144 health</div>
+                    <div className="text-xs text-ink-600">30-day trailing window.</div>
+                  </div>
+                  <Pill tone="ok" dot>Improving</Pill>
+                </div>
+                <div className="mt-5 h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={TREND} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} /><stop offset="95%" stopColor="#6366F1" stopOpacity={0} /></linearGradient>
+                        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10B981" stopOpacity={0.3} /><stop offset="95%" stopColor="#10B981" stopOpacity={0} /></linearGradient>
+                      </defs>
+                      <CartesianGrid stroke="#E2E8F0" vertical={false} />
+                      <XAxis dataKey="day" tickLine={false} axisLine={false} stroke="#475569" fontSize={12} />
+                      <YAxis tickLine={false} axisLine={false} stroke="#475569" fontSize={12} />
+                      <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 12 }} />
+                      <Area type="monotone" dataKey="timeToFill" stroke="#6366F1" fill="url(#g1)" strokeWidth={2} />
+                      <Area type="monotone" dataKey="ll144" stroke="#10B981" fill="url(#g2)" strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-ink-600">
+                  <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-brand-500" /> Time to fill (days)</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-ok-500" /> LL144 health (score)</span>
+                </div>
+              </Card>
+
+              <Card>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold text-ink-900">Compliance health</div>
+                  <Pill tone="ok">All checks pass</Pill>
+                </div>
+                <div className="relative mx-auto mt-4 h-44 w-44">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadialBarChart innerRadius="76%" outerRadius="100%" data={[{ name: '4/5 rule', value: 92, fill: '#10B981' }]} startAngle={90} endAngle={-270}>
+                      <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+                      <RadialBar background={{ fill: '#E2E8F0' }} dataKey="value" cornerRadius={999} />
+                    </RadialBarChart>
+                  </ResponsiveContainer>
+                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="text-4xl font-bold leading-none text-ink-900">92</span>
+                      <span className="text-sm font-semibold text-ink-500">/100</span>
+                    </div>
+                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-ok-700">PASS · 4/5 rule</div>
+                  </div>
+                </div>
+                <div className="mt-3 text-center text-xs text-ink-600">Four-fifths rule margin · all reported groups</div>
+                <div className="mt-4 space-y-2 text-xs">
+                  <div className="flex items-center justify-between"><span className="text-ink-700">10-day candidate notices</span><Pill tone="ok">100%</Pill></div>
+                  <div className="flex items-center justify-between"><span className="text-ink-700">Tamper-evident log</span><Pill tone="ok">Healthy</Pill></div>
+                  <div className="flex items-center justify-between"><span className="text-ink-700">Cross-jurisdiction</span><Pill tone="warn">EU AI Act in progress</Pill></div>
+                </div>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-ink-900">Hiring funnel — last 30 days</div>
+                    <div className="text-xs text-ink-600">Stages 1–3 are agent-driven; stages 4–5 are recruiter-led.</div>
+                  </div>
+                </div>
+                <div className="mt-4 h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={FUNNEL} margin={{ top: 10, right: 10, left: -10, bottom: 0 }} barCategoryGap={28}>
+                      <CartesianGrid stroke="#E2E8F0" vertical={false} />
+                      <XAxis dataKey="stage" tickLine={false} axisLine={false} stroke="#475569" fontSize={12} />
+                      <YAxis tickLine={false} axisLine={false} stroke="#475569" fontSize={12} />
+                      <Tooltip cursor={{ fill: '#F1F5F9' }} contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 12 }} />
+                      <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                        {FUNNEL.map((_, i) => (<Cell key={i} fill={i < 3 ? '#10B981' : '#0F172A'} />))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+
+              <Card>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold text-ink-900">Live activity feed</div>
+                  <Pill tone="ok" dot>Live</Pill>
+                </div>
+                <ActivityFeed compact />
+              </Card>
+            </div>
+          </div>
+        );
+      }
+
+      /* ---------------------------------------------------------------------------
+         Activity feed (used on Dashboard + Agents)
+         --------------------------------------------------------------------------- */
+      function ActivityFeed({ compact }) {
+        const [items, setItems] = useState(() => seedFeed(7));
+        useEffect(() => {
+          const t = setInterval(() => setItems((prev) => [makeFeedItem(), ...prev].slice(0, compact ? 8 : 14)), 2400);
+          return () => clearInterval(t);
+        }, [compact]);
+        return (
+          <div className="scroll-soft mt-3 max-h-[420px] space-y-2 overflow-y-auto pr-1">
+            {items.map((it) => (
+              <div key={it.id} className="feed-in flex items-start gap-3 rounded-lg border border-surface-200 bg-surface-50/60 px-3 py-2">
+                <div className={classNames('mt-0.5 h-2 w-2 flex-shrink-0 rounded-full', dotColor(it.tone))}></div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[13px] text-ink-800">
+                    <span className="font-semibold">{it.agent}</span> <span className="text-ink-600">{it.verb}</span> <span className="text-ink-600">{it.noun}</span> <span className="font-mono text-ink-900">{it.target}</span>
+                  </div>
+                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-ink-600">
+                    <span>{it.timeAgo}</span><span>·</span><span className="font-mono">ev {it.hash}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      }
+      let __feedSeq = 1;
+      function makeFeedItem() {
+        const t = FEED_TEMPLATES[Math.floor(Math.random() * FEED_TEMPLATES.length)];
+        const target = 'REQ-' + (200 + Math.floor(Math.random() * 60)) + ' / CND-' + (10000 + Math.floor(Math.random() * 800));
+        const hash = '0x' + Math.random().toString(16).slice(2, 6) + '\u2026' + Math.random().toString(16).slice(2, 4);
+        return { id: ++__feedSeq + '-' + Date.now(), ...t, target, hash, timeAgo: 'just now' };
+      }
+      function seedFeed(n) {
+        const out = [];
+        const ages = ['just now','12s ago','34s ago','1m ago','2m ago','3m ago','4m ago','6m ago'];
+        for (let i = 0; i < n; i++) out.push({ ...makeFeedItem(), timeAgo: ages[i] || (i + 'm ago') });
+        return out;
+      }
+
+      /* ---------------------------------------------------------------------------
+         Page: AI Agents
+         --------------------------------------------------------------------------- */
+      function AgentsPage() {
+        const [openAgent, setOpenAgent] = useState(null);
+        return (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
+              {AGENTS.map((a) => (
+                <button key={a.id} onClick={() => setOpenAgent(a)} className="group relative overflow-hidden rounded-xl border border-surface-200 bg-white p-5 text-left shadow-soft transition hover:border-brand-100 hover:shadow-card">
+                  <div className="flex items-start justify-between">
+                    <div className={classNames('flex h-10 w-10 items-center justify-center rounded-lg', toneBg(a.tone))}><Icon name={a.icon} className="h-5 w-5" /></div>
+                    <Pill tone={a.status === 'Active' ? 'ok' : 'slate'} dot={a.status === 'Active'}>{a.status}</Pill>
+                  </div>
+                  <div className="mt-4">
+                    <div className="text-base font-semibold text-ink-900">{a.name}</div>
+                    <div className="text-xs text-ink-600">{a.tagline}</div>
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-3 border-t border-surface-200 pt-4 text-xs">
+                    <Stat label="Tasks today" value={a.tasksToday.toLocaleString()} />
+                    <Stat label="Avg time" value={fmtSec(a.avgTimeSec)} />
+                    <Stat label="Success" value={Math.round(a.successRate * 100) + '%'} />
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-[11px] text-ink-600">
+                    <span className="font-mono">{a.modelVersion}</span>
+                    <span className="inline-flex items-center gap-1 font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">Open details <Icon name="arrow-right" className="h-3 w-3" /></span>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <Card className="lg:col-span-1">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold text-ink-900">Live activity feed</div>
+                  <div className="text-xs text-ink-600">Hash-chained events; tamper-evident log.</div>
+                </div>
+                <Pill tone="ok" dot>Live</Pill>
+              </div>
+              <ActivityFeed />
+            </Card>
+            {openAgent && <AgentModal agent={openAgent} onClose={() => setOpenAgent(null)} />}
+          </div>
+        );
+      }
+
+      function AgentModal({ agent, onClose }) {
+        return (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/30 p-4 backdrop-blur-sm sm:items-center">
+            <div className="w-full max-w-2xl rounded-2xl border border-surface-200 bg-white shadow-card animate-fadeUp">
+              <div className="flex items-start justify-between border-b border-surface-200 p-6">
+                <div className="flex items-center gap-3">
+                  <div className={classNames('flex h-12 w-12 items-center justify-center rounded-xl', toneBg(agent.tone))}><Icon name={agent.icon} className="h-6 w-6" /></div>
+                  <div>
+                    <div className="text-lg font-bold text-ink-900">{agent.name}</div>
+                    <div className="text-xs text-ink-600">{agent.tagline}</div>
+                  </div>
+                </div>
+                <button onClick={onClose} className="rounded-lg border border-surface-200 p-1.5 text-ink-600 hover:bg-surface-50"><Icon name="x" className="h-4 w-4" /></button>
+              </div>
+              <div className="space-y-5 p-6">
+                <p className="text-sm leading-relaxed text-ink-700">{agent.description}</p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <Stat label="Tasks today" value={agent.tasksToday.toLocaleString()} />
+                  <Stat label="Avg time" value={fmtSec(agent.avgTimeSec)} />
+                  <Stat label="Success rate" value={Math.round(agent.successRate * 100) + '%'} />
+                  <Stat label="Status" value={agent.status} />
+                </div>
+                <div className="rounded-lg border border-surface-200 bg-surface-50 p-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-600">Provenance</div>
+                  <div className="mt-1 grid grid-cols-1 gap-1 text-xs sm:grid-cols-2">
+                    <div><span className="text-ink-600">Version: </span><span className="font-mono text-ink-900">{agent.modelVersion}</span></div>
+                    <div className="sm:col-span-2"><span className="text-ink-600">SAP touchpoint: </span><span className="text-ink-900">{agent.sapTouchpoint}</span></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-600">Recent decisions (period)</div>
+                  <ul className="space-y-2 text-sm text-ink-700">
+                    {agent.decisions.map((d, i) => <li key={i} className="flex items-start gap-2"><Icon name="circle-check-big" className="mt-0.5 h-4 w-4 flex-shrink-0 text-ok-500" /><span>{d}</span></li>)}
+                  </ul>
+                </div>
+                <div className="rounded-lg border border-ok-100 bg-ok-50 p-3 text-xs text-ok-700">
+                  <span className="font-semibold">Audit-evident:</span> every decision above is hash-chained into the tamper-evident log used by the Bias Audit module.
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      /* ---------------------------------------------------------------------------
+         Page: Candidates
+         --------------------------------------------------------------------------- */
+      function CandidatesPage() {
+        const [stage, setStage] = useState('All');
+        const [q, setQ] = useState('');
+        const [openId, setOpenId] = useState(null);
+        const stages = ['All','Sourced','Screened','Interviewed','Offer','Hired'];
+        const filtered = useMemo(() => CANDIDATES.filter((c) => {
+          if (stage !== 'All' && c.stage !== stage) return false;
+          if (q && !(c.name + ' ' + c.role + ' ' + c.skills.join(' ')).toLowerCase().includes(q.toLowerCase())) return false;
+          return true;
+        }), [stage, q]);
+        const open = filtered.find(c => c.id === openId) || CANDIDATES.find(c => c.id === openId);
+        return (
+          <Fragment>
+            <Card padded={false}>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-surface-200 px-5 py-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  {stages.map(s => (
+                    <button key={s} onClick={() => setStage(s)} className={classNames('rounded-full border px-3 py-1.5 text-xs font-semibold', stage === s ? 'border-ink-900 bg-ink-900 text-white' : 'border-surface-200 bg-white text-ink-700 hover:bg-surface-50')}>{s}</button>
+                  ))}
+                </div>
+                <div className="relative">
+                  <Icon name="search" className="absolute left-3 top-2.5 h-4 w-4 text-ink-600" />
+                  <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, skill, role…" className="w-72 rounded-lg border border-surface-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" />
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-surface-50 text-xs uppercase tracking-wider text-ink-600">
+                    <tr className="text-left">
+                      <th className="px-5 py-3">Candidate</th><th className="px-5 py-3">Role / Req</th><th className="px-5 py-3">Skills</th><th className="px-5 py-3">AI score</th><th className="px-5 py-3">Stage</th><th className="px-5 py-3">Audit</th><th className="px-5 py-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map(c => (
+                      <tr key={c.id} className="border-t border-surface-200 hover:bg-surface-50/60">
+                        <td className="px-5 py-3"><div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-full bg-ink-900 text-xs font-semibold text-white">{c.initials}</div><div><div className="font-semibold text-ink-900">{c.name}</div><div className="text-xs text-ink-600">{c.location} · <span className="font-mono">{c.id}</span></div></div></div></td>
+                        <td className="px-5 py-3 text-ink-700">{c.role}</td>
+                        <td className="px-5 py-3"><div className="flex flex-wrap gap-1">{c.skills.slice(0,3).map(s => <span key={s} className="rounded-md bg-surface-100 px-2 py-0.5 text-[11px] font-medium text-ink-700">{s}</span>)}</div></td>
+                        <td className="px-5 py-3"><Pill tone={c.score >= 90 ? 'ok' : c.score >= 80 ? 'emerald' : c.score >= 70 ? 'amber' : 'slate'}>{c.score}</Pill></td>
+                        <td className="px-5 py-3"><Pill tone={pillToneForStage(c.stage)}>{c.stage}</Pill></td>
+                        <td className="px-5 py-3"><span className="inline-flex items-center gap-1 text-xs text-ok-700"><Icon name="shield-check" className="h-3.5 w-3.5" /> logged</span></td>
+                        <td className="px-5 py-3 text-right"><button onClick={() => setOpenId(c.id)} className="inline-flex items-center gap-1 rounded-md border border-surface-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-ink-700 hover:bg-surface-50">Why this score? <Icon name="arrow-right" className="h-3 w-3" /></button></td>
+                      </tr>
+                    ))}
+                    {filtered.length === 0 && <tr><td colSpan={7} className="px-5 py-10 text-center text-sm text-ink-600">No candidates match those filters.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+            {open && <CandidateDrawer candidate={open} onClose={() => setOpenId(null)} />}
+          </Fragment>
+        );
+      }
+
+      function CandidateDrawer({ candidate, onClose }) {
+        return (
+          <div className="fixed inset-0 z-50 flex justify-end bg-ink-900/30 backdrop-blur-sm">
+            <div className="scroll-soft h-full w-full max-w-xl overflow-y-auto bg-white shadow-card animate-fadeUp">
+              <div className="flex items-start justify-between border-b border-surface-200 p-6">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-900 text-sm font-semibold text-white">{candidate.initials}</div>
+                  <div><div className="text-lg font-bold text-ink-900">{candidate.name}</div><div className="text-xs text-ink-600">{candidate.role} · {candidate.location} · <span className="font-mono">{candidate.id}</span></div></div>
+                </div>
+                <button onClick={onClose} className="rounded-lg border border-surface-200 p-1.5 text-ink-600 hover:bg-surface-50"><Icon name="x" className="h-4 w-4" /></button>
+              </div>
+              <div className="space-y-5 p-6">
+                <div className="flex items-center gap-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-600">Stage</div><Pill tone={pillToneForStage(candidate.stage)}>{candidate.stage}</Pill>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-600">Score</div><Pill tone={candidate.score >= 90 ? 'ok' : candidate.score >= 80 ? 'emerald' : candidate.score >= 70 ? 'amber' : 'slate'}>{candidate.score}</Pill>
+                </div>
+                <div className="rounded-lg border border-ok-100 bg-ok-50 p-4">
+                  <div className="flex items-center gap-2 text-ok-700"><Icon name="shield-check" className="h-4 w-4" /><span className="text-xs font-semibold uppercase tracking-wider">Why this score</span></div>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-800">{candidate.rationale}</p>
+                  <div className="mt-3 flex items-center gap-2 text-[11px] text-ok-700"><Icon name="link" className="h-3 w-3" /> Citations: 4 spans matched · Model: <span className="font-mono">screener-v3.2</span></div>
+                </div>
+                <div><div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-600">Top matched skills</div><div className="flex flex-wrap gap-1.5">{candidate.topMatched.map(s => <span key={s} className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700"><Icon name="check" className="h-3 w-3" /> {s}</span>)}</div></div>
+                <div><div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-600">Gaps</div><div className="flex flex-wrap gap-1.5">{candidate.gaps.map(g => <span key={g} className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700"><Icon name="circle-alert" className="h-3 w-3" /> {g}</span>)}</div></div>
+                <div className="rounded-lg border border-surface-200 bg-surface-50 p-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-600">Audit trail</div>
+                  <ul className="mt-2 space-y-1.5 text-xs text-ink-700">
+                    <li className="flex items-center gap-2"><Icon name="circle-dot" className="h-3 w-3 text-sky-500" /> Sourced — {candidate.agentDecisionAt}</li>
+                    <li className="flex items-center gap-2"><Icon name="circle-dot" className="h-3 w-3 text-violet-500" /> Screened — score {candidate.score}/100, hash <span className="font-mono">0xab…29</span></li>
+                    <li className="flex items-center gap-2"><Icon name="circle-dot" className="h-3 w-3 text-amber-500" /> 10-day notice sent — Local Law 144 compliant</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      /* ---------------------------------------------------------------------------
+         Page: Bias Audit (LL144) — strengthened for 3rd-party audit positioning
+         --------------------------------------------------------------------------- */
+      function BiasAuditPage() {
+        const m = AUDIT_META;
+        const sex = useMemo(() => withImpactRatio(AUDIT_BY_SEX), []);
+        const race = useMemo(() => withImpactRatio(AUDIT_BY_RACE), []);
+        const allPass = sex.every(r => r.impactRatio >= 0.8) && race.every(r => r.impactRatio >= 0.8);
+
+        return (
+          <div className="space-y-6">
+            <div className="overflow-hidden rounded-2xl border border-ok-100 bg-gradient-to-br from-ok-50 via-white to-brand-50">
+              <div className="flex flex-col items-start justify-between gap-6 p-6 md:flex-row md:items-center">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-ok-500 text-white"><Icon name="shield-check" className="h-6 w-6" /></div>
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ok-700">Independent third-party AEDT bias audit</div>
+                    <h2 className="mt-1 text-xl font-bold text-ink-900">{m.aedt} — <span className="text-ok-700">Compliant</span></h2>
+                    <div className="mt-1 text-sm text-ink-700">Period <span className="font-semibold">{m.period}</span> · Audited <span className="font-semibold">{m.auditDate}</span> · Next due <span className="font-semibold">{m.nextDue}</span></div>
+                    <div className="mt-1 text-xs text-ink-600">Audit ID <span className="font-mono">{m.auditId}</span> · Methodology: {m.methodology}</div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button className="inline-flex items-center gap-1.5 rounded-lg bg-ink-900 px-3 py-2 text-xs font-semibold text-white hover:bg-ink-800"><Icon name="download" className="h-3.5 w-3.5" /> Auditor's Report (PDF)</button>
+                  <button className="inline-flex items-center gap-1.5 rounded-lg border border-ink-900 bg-white px-3 py-2 text-xs font-semibold text-ink-900 hover:bg-surface-50"><Icon name="file-text" className="h-3.5 w-3.5" /> Public Summary</button>
+                  <button className="inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-50"><Icon name="braces" className="h-3.5 w-3.5" /> JSON for regulators</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm leading-relaxed text-ink-800">
+              <div className="mb-1 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-700"><Icon name="info" className="h-3.5 w-3.5" /> Why this audit qualifies as "independent"</div>
+              The auditor is structurally separated from the AEDT vendor and the employer. NYC Local Law 144 §20-870 requires this independence; EEOC Title VII guidance reinforces that "delegation to an algorithm does not transfer legal responsibility." Methodology is reproducible from raw event log to public summary — byte-identical, on demand.
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <StatCard label="Applicants in audit" value={(AUDIT_BY_SEX.reduce((s, r) => s + r.applicants, 0)).toLocaleString()} icon="users" />
+              <StatCard label="Selected" value={(AUDIT_BY_SEX.reduce((s, r) => s + r.selected, 0)).toLocaleString()} icon="user-check" />
+              <StatCard label="Four-fifths rule" value={allPass ? 'PASS' : 'REVIEW'} icon="scale" tone={allPass ? 'ok' : 'warn'} />
+              <StatCard label="Auditor" value="Independent · third-party" icon="badge-check" tone="ok" />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <ImpactTable title="Selection rates by sex" rows={sex} />
+              <ImpactTable title="Selection rates by race / ethnicity" rows={race} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-2">
+                <div className="mb-1 text-sm font-semibold text-ink-900">Intersectional analysis (Sex × Race)</div>
+                <div className="text-xs text-ink-600">LL144 §20-871 requires intersectional impact-ratio computation.</div>
+                <div className="mt-4 h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={AUDIT_INTERSECTIONAL} layout="vertical" margin={{ left: 30, right: 10 }}>
+                      <CartesianGrid stroke="#E2E8F0" horizontal={false} />
+                      <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} stroke="#475569" tickFormatter={(v) => (v * 100).toFixed(0) + '%'} />
+                      <YAxis type="category" dataKey="intersection" tickLine={false} axisLine={false} fontSize={12} stroke="#475569" width={150} />
+                      <Tooltip formatter={(v) => (v * 100).toFixed(1) + '%'} contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 12 }} cursor={{ fill: '#F1F5F9' }} />
+                      <Bar dataKey="selectionRate" radius={[0, 6, 6, 0]} fill="#10B981" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+
+              <Card>
+                <div className="text-sm font-semibold text-ink-900">Public Summary preview</div>
+                <div className="text-xs text-ink-600">Auto-generated for the employer's website (LL144 §20-871).</div>
+                <div className="mt-3 rounded-lg border border-surface-200 bg-surface-50 p-4 text-[12px] leading-relaxed text-ink-800">
+                  <div className="font-semibold text-ink-900">[Employer Name] — AEDT Bias Audit Public Summary</div>
+                  <div className="mt-1 text-ink-600">Audited {m.auditDate} · Period {m.period}</div>
+                  <ul className="mt-3 list-disc pl-4">
+                    <li>AEDT: <span className="font-mono">{m.aedt}</span></li>
+                    <li>Auditor: {m.auditor}</li>
+                    <li>Methodology: {m.methodology}</li>
+                    <li>Result: {allPass ? 'Four-fifths rule met for all reported groups.' : "See auditor's report — flagged groups under review."}</li>
+                    <li>Hash: <span className="font-mono">{m.sigSha}</span></li>
+                  </ul>
+                </div>
+                <button className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-ink-900 px-3 py-2 text-xs font-semibold text-white hover:bg-ink-800"><Icon name="globe" className="h-3.5 w-3.5" /> Publish to employer website</button>
+              </Card>
+            </div>
+
+            <Card>
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold text-ink-900">Cross-jurisdiction compliance crosswalk</div>
+                  <div className="text-xs text-ink-600">One audit, mapped to every jurisdiction your employer hires in.</div>
+                </div>
+                <Pill tone="ok" dot>Recurring annual</Pill>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-surface-50 text-xs uppercase tracking-wider text-ink-600">
+                    <tr className="text-left"><th className="px-4 py-2">Jurisdiction / Standard</th><th className="px-4 py-2">Status</th><th className="px-4 py-2">Notes</th></tr>
+                  </thead>
+                  <tbody>
+                    {CROSS_JURIS.map(row => (
+                      <tr key={row.law} className="border-t border-surface-200">
+                        <td className="px-4 py-3 font-semibold text-ink-900">{row.law}</td>
+                        <td className="px-4 py-3"><Pill tone={row.status === 'Compliant' ? 'ok' : 'warn'}>{row.status}</Pill></td>
+                        <td className="px-4 py-3 text-ink-700">{row.note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        );
+      }
+
+      function withImpactRatio(rows) { const max = Math.max(...rows.map(r => r.selectionRate)); return rows.map(r => ({ ...r, impactRatio: r.selectionRate / max })); }
+      function ImpactTable({ title, rows }) {
+        return (
+          <Card padded={false}>
+            <div className="border-b border-surface-200 px-5 py-4">
+              <div className="text-sm font-semibold text-ink-900">{title}</div>
+              <div className="text-xs text-ink-600">Reference group is the highest-selection-rate group; threshold 0.80.</div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-surface-50 text-xs uppercase tracking-wider text-ink-600">
+                  <tr className="text-left"><th className="px-5 py-2">Group</th><th className="px-5 py-2 text-right">Applicants</th><th className="px-5 py-2 text-right">Selected</th><th className="px-5 py-2 text-right">Rate</th><th className="px-5 py-2 text-right">Impact ratio</th><th className="px-5 py-2 text-right">4/5 rule</th></tr>
+                </thead>
+                <tbody>
+                  {rows.map(r => {
+                    const pass = r.impactRatio >= 0.8;
+                    return (
+                      <tr key={r.group} className="border-t border-surface-200">
+                        <td className="px-5 py-3 font-semibold text-ink-900">{r.group}</td>
+                        <td className="px-5 py-3 text-right text-ink-700">{r.applicants.toLocaleString()}</td>
+                        <td className="px-5 py-3 text-right text-ink-700">{r.selected.toLocaleString()}</td>
+                        <td className="px-5 py-3 text-right text-ink-700">{(r.selectionRate * 100).toFixed(1)}%</td>
+                        <td className="px-5 py-3 text-right"><span className={classNames('rounded-md px-2 py-0.5 text-xs font-semibold', pass ? 'bg-ok-50 text-ok-700' : 'bg-warn-50 text-warn-700')}>{r.impactRatio.toFixed(3)}</span></td>
+                        <td className="px-5 py-3 text-right"><Pill tone={pass ? 'ok' : 'warn'}>{pass ? 'Pass' : 'Review'}</Pill></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        );
+      }
+
+      /* ---------------------------------------------------------------------------
+         Page: Compliance
+         --------------------------------------------------------------------------- */
+      function CompliancePage() {
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-2">
+                <div className="mb-3 flex items-center justify-between">
+                  <div><div className="text-sm font-semibold text-ink-900">SAP integrations</div><div className="text-xs text-ink-600">Live health of every system AuditReady writes to.</div></div>
+                  <Pill tone="ok" dot>All healthy</Pill>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {SAP_INTEGRATIONS.map(s => (
+                    <div key={s.name} className="flex items-center justify-between rounded-lg border border-surface-200 bg-surface-50 px-4 py-3">
+                      <div><div className="text-sm font-semibold text-ink-900">{s.name}</div><div className="text-[11px] text-ink-600">{s.lastSync} · p50 {s.latencyMs} ms</div></div>
+                      <Pill tone="ok" dot>{s.status}</Pill>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+              <Card>
+                <div className="mb-3 text-sm font-semibold text-ink-900">AEDT inventory</div>
+                <div className="space-y-2 text-sm">
+                  <InventoryRow name="AuditReady Screener Agent" version="screener-v3.2" status="Audited" tone="ok" />
+                  <InventoryRow name="AuditReady Interviewer Agent" version="interviewer-v1.9" status="Audited" tone="ok" />
+                  <InventoryRow name="Legacy ATS scoring rule" version="legacy-rule-v1" status="Decommission" tone="warn" />
+                  <InventoryRow name="HireVue (third-party)" version="—" status="Audit due" tone="warn" />
+                </div>
+                <button className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-surface-200 bg-white px-3 py-2 text-xs font-semibold text-ink-700 hover:bg-surface-50"><Icon name="plus" className="h-3.5 w-3.5" /> Register new AEDT</button>
+              </Card>
+            </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-2">
+                <div className="mb-3 text-sm font-semibold text-ink-900">Tamper-evident audit log (last 8)</div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-surface-50 text-xs uppercase tracking-wider text-ink-600"><tr className="text-left"><th className="px-4 py-2">Time</th><th className="px-4 py-2">Actor</th><th className="px-4 py-2">Action</th><th className="px-4 py-2">Event</th></tr></thead>
+                    <tbody>
+                      {AUDIT_LOG.map(row => (
+                        <tr key={row.ts} className="border-t border-surface-200">
+                          <td className="px-4 py-2 text-xs font-mono text-ink-600">{row.ts}</td>
+                          <td className="px-4 py-2 text-ink-900">{row.actor}</td>
+                          <td className="px-4 py-2 text-ink-700">{row.action}</td>
+                          <td className="px-4 py-2 font-mono text-xs text-ink-600">{row.ev}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+              <Card>
+                <div className="mb-3 text-sm font-semibold text-ink-900">Candidate notices (10-day rule)</div>
+                <ul className="space-y-2">
+                  {CANDIDATE_NOTICES.map(n => (
+                    <li key={n.id} className="flex items-center justify-between rounded-lg border border-surface-200 bg-surface-50 px-3 py-2">
+                      <div><div className="text-sm font-semibold text-ink-900">{n.name}</div><div className="text-[11px] text-ink-600">{n.sentAt} · {n.channel}</div></div>
+                      <Pill tone={n.status === 'Alt path requested' ? 'warn' : 'ok'}>{n.status}</Pill>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
+          </div>
+        );
+      }
+      function InventoryRow({ name, version, status, tone }) {
+        return <div className="flex items-center justify-between rounded-lg border border-surface-200 px-3 py-2"><div><div className="text-sm font-semibold text-ink-900">{name}</div><div className="text-[11px] font-mono text-ink-600">{version}</div></div><Pill tone={tone}>{status}</Pill></div>;
+      }
+
+      /* ---------------------------------------------------------------------------
+         Page: Why this fits (replaces hard-coded firm branding)
+         --------------------------------------------------------------------------- */
+      function WhyFitPage() {
+        return (
+          <div className="space-y-6">
+            <div className="relative overflow-hidden rounded-2xl border border-surface-200 bg-gradient-to-br from-ink-900 via-ink-800 to-brand-700 p-8 text-white shadow-card">
+              <div className="pointer-events-none absolute inset-0 grid-pattern opacity-10" />
+              <div className="relative max-w-3xl">
+                <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-100">For an SAP-anchored consultancy with an AI-governance practice</div>
+                <h2 className="text-3xl font-bold leading-tight tracking-tight md:text-4xl">A product the right firm can sell on day one — and bill annually forever.</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80">If your firm has these five characteristics, this product is a strategic fit. The reason is structural: NYC Local Law 144 forces the auditor to be independent of the AI tool vendor — the same firm that builds the agents legally cannot be the auditor. That gap is the moat.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FitCard num="01" title="SAP SuccessFactors implementation depth" body="You already implement, migrate, and operate SuccessFactors (Recruiting, EC, Onboarding, Time, Payroll). AuditReady deploys on top of that stack — the agents live in BTP + AI Core and surface through Joule. You sell the implementation services; the customer pays per-hire and per-audit." />
+              <FitCard num="02" title="An AI governance practice already on the menu" body="If your firm sells 'AI strategy + governance + adoption roadmaps,' AuditReady is the product version of that practice. It turns advisory hours into recurring SaaS-like revenue without changing the team you already have." />
+              <FitCard num="03" title="MWBE certification or diverse-supplier status" body="Many NYC, NYS, federal, and Fortune 500 RFPs require or prefer MWBE/diverse suppliers. For Local Law 144 audits specifically, MWBE-certified auditors are a strong match for public-sector and procurement-led buyers." />
+              <FitCard num="04" title="Independence from any AI tool vendor" body="LL144 requires the bias auditor to be structurally independent of the AEDT vendor. A consultancy that does not make its own AI hiring tool is, by definition, independent. That is not negotiable in the law — and it is your durable advantage over Big-4 and over the AI vendors themselves." />
+              <FitCard num="05" title="Northeast presence + 20+ years of consulting credibility" body="NYC, NJ, and the broader tri-state are the densest concentration of LL144-affected employers in the country. A firm with east-coast delivery muscle and decades of regulated-industry references can capture this market before the West Coast SaaS players figure out the legal posture." />
+              <FitCard num="06" title="Hybrid revenue: services + recurring audit retainer" body="Per-customer business model: $200K–$1.5M implementation, plus $25K–$150K per-AEDT-per-year audit retainer, plus optional managed compliance ops. Services up front, recurring forever — without becoming a SaaS company." />
+            </div>
+
+            <Card>
+              <div className="mb-2 text-sm font-semibold text-ink-900">What the right firm gets in 12 months</div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <RoiCard kpi="$4M" label="Annual recurring audit revenue" sub="Modeled on 30 customers × ~$130K per AEDT/year" />
+                <RoiCard kpi="10–15" label="Net-new SuccessFactors implementations" sub="From audit-led pull-through alone" />
+                <RoiCard kpi="3–5×" label="Lift in new-logo win rate" sub="MWBE + audit independence + SAP depth = a category nobody else can credibly bid against" />
+              </div>
+            </Card>
+
+            <Card>
+              <div className="mb-3 text-sm font-semibold text-ink-900">Bills of materials — what to commit to in 90 days</div>
+              <ol className="space-y-2 text-sm text-ink-700">
+                <li className="flex items-start gap-3"><span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">1</span> Stand up an "Audit Practice" wall — organizationally separated from your Implementation Practice (mirrors Big-4 audit/consulting separation).</li>
+                <li className="flex items-start gap-3"><span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">2</span> Recruit 2 design partners — one NYC insurer, one city agency. Both live with LL144 risk; both have SAP HCM. Co-fund the production build.</li>
+                <li className="flex items-start gap-3"><span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">3</span> Productionize the audit engine on SAP BTP + AI Core. Single-tenant; customer data never leaves their tenant.</li>
+                <li className="flex items-start gap-3"><span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">4</span> Ship the first agent (Screener) GA on SAP Joule HR (May 2026) — ride the launch wave.</li>
+                <li className="flex items-start gap-3"><span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">5</span> Dogfood the audit on your own staff aug pipeline. Publish your own LL144 Public Summary. Use it as the reference customer.</li>
+                <li className="flex items-start gap-3"><span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">6</span> Build the cross-jurisdiction crosswalk: NYC LL144 → IL AIVIA → CO AI Act → EU AI Act. One audit, four jurisdictions billed.</li>
+              </ol>
+            </Card>
+
+            <div className="rounded-2xl border border-surface-200 bg-white p-6">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-600">A note on the demo</div>
+              <p className="mt-1 max-w-3xl text-sm leading-relaxed text-ink-700">
+                This is a working prototype, not the production system. The Live Demo runs real skill-extraction and scoring in your browser (open dev tools, you can read the code). The production version replaces the in-browser scorer with a multi-agent system on SAP AI Core, the audit log with a tamper-evident store on SAP BTP, and the candidate notices with a managed delivery service. Architecture and PRD are in the <span className="font-mono">SAP/docs/</span> folder of this prototype.
+              </p>
+            </div>
+          </div>
+        );
+      }
+      function FitCard({ num, title, body }) {
+        return (
+          <Card>
+            <div className="flex items-start gap-4">
+              <div className="font-mono text-2xl font-bold text-brand-500/80">{num}</div>
+              <div>
+                <div className="text-sm font-bold text-ink-900">{title}</div>
+                <div className="mt-1 text-sm leading-relaxed text-ink-700">{body}</div>
+              </div>
+            </div>
+          </Card>
+        );
+      }
+      function RoiCard({ kpi, label, sub }) {
+        return (
+          <div className="rounded-xl border border-surface-200 bg-gradient-to-br from-brand-50 via-white to-ok-50 p-4">
+            <div className="text-3xl font-bold gradient-text">{kpi}</div>
+            <div className="mt-1 text-sm font-semibold text-ink-900">{label}</div>
+            <div className="mt-1 text-xs text-ink-600">{sub}</div>
+          </div>
+        );
+      }
+
+      /* ---------------------------------------------------------------------------
+         App shell
+         --------------------------------------------------------------------------- */
+      function App() {
+        const [active, setActive] = useState('demo');
+
+        const [theme, setTheme] = useState(() => {
+          try {
+            const saved = localStorage.getItem('auditready-theme');
+            if (saved === 'dark' || saved === 'light') return saved;
+          } catch (_e) {}
+          if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+          return 'light';
+        });
+
+        useEffect(() => {
+          document.documentElement.setAttribute('data-theme', theme);
+          try { localStorage.setItem('auditready-theme', theme); } catch (_e) {}
+        }, [theme]);
+
+        const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+
+        useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
+
+        const titles = {
+          demo: { eyebrow: 'Live Demo', title: 'Run the agentic hiring pipeline on your own data', subtitle: 'Paste a job description and a resume below. Six agents will execute the screening pipeline in your browser, in real time, with every decision logged for audit.' },
+          dashboard: { eyebrow: 'Executive Dashboard', title: 'Hiring & compliance at a glance', subtitle: 'Real-time view across all open requisitions, agent productivity, and Local Law 144 status.' },
+          agents: { eyebrow: 'Agentic Hiring Crew', title: 'Six SAP-native agents working as one team', subtitle: 'Sourcer · Screener · Interviewer · Scheduler · Offer Drafter · Audit — orchestrated on SAP BTP + AI Core, surfaced through SAP Joule.' },
+          candidates: { eyebrow: 'Recruiter Workspace', title: 'Candidates with explainable AI scoring', subtitle: 'Every score is explainable, every override is logged. Designed to be defensible in court.' },
+          audit: { eyebrow: 'Independent Third-Party Audit', title: 'NYC Local Law 144 — Annual bias audit', subtitle: 'Auto-computed selection rates, four-fifths rule, intersectional analysis, and a publishable Public Summary. Cross-walks to EEOC, IL AIVIA, CO AI Act, and EU AI Act.' },
+          compliance: { eyebrow: 'Compliance Cockpit', title: 'Operations view for legal & compliance', subtitle: 'AEDT inventory, candidate-notice delivery log, SAP integration health, and a tamper-evident audit log.' },
+          fit: { eyebrow: 'Strategic fit', title: 'Why this product fits an SAP-anchored consultancy', subtitle: 'A working brief on the structural reasons this is the right product for the right firm at the right moment.' },
+        };
+        const t = titles[active];
+
+        return (
+          <div className="flex h-full">
+            <Sidebar active={active} setActive={setActive} />
+            <main className="flex flex-1 flex-col overflow-hidden bg-surface-50">
+              <Topbar titleEyebrow={t.eyebrow} title={t.title} subtitle={t.subtitle} right={null} theme={theme} onToggleTheme={toggleTheme} />
+              <div className="scroll-soft flex-1 overflow-y-auto px-8 py-6">
+                {active === 'demo' && <LiveDemoPage />}
+                {active === 'dashboard' && <DashboardPage />}
+                {active === 'agents' && <AgentsPage />}
+                {active === 'candidates' && <CandidatesPage />}
+                {active === 'audit' && <BiasAuditPage />}
+                {active === 'compliance' && <CompliancePage />}
+                {active === 'fit' && <WhyFitPage />}
+                <footer className="mt-10 border-t border-surface-200 pt-4 text-center text-[11px] text-ink-600">
+                  AuditReady · working demo · {new Date().getFullYear()} · UI mock; production runs on SAP BTP + AI Core
+                </footer>
+              </div>
+            </main>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>
